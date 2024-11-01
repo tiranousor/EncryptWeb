@@ -155,7 +155,7 @@
             <div class="toggle-panel toggle-right">
                 <h1>Еще не зарегистрированы?</h1>
                 <p>Пора исправлять!</p>
-                <a href="/process_registration">
+                <a href="/registration">
                     <button class="hidden" id="register">Зарегистрироваться</button>
                 </a>
             </div>
@@ -168,11 +168,6 @@
     const registerBtn = document.getElementById('register');
     const loginBtn = document.getElementById('login');
 
-    if (registerBtn) {
-        registerBtn.addEventListener('click', () => {
-            container.classList.add("active");
-        });
-    }
 
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {

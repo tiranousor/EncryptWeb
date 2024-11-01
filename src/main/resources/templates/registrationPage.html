@@ -226,36 +226,39 @@
 <body>
 
 <div class="container" id="container">
-    <div class="form-container sign-in">
-        <form action="/process_login" method="post">
-            <h1>Sign In</h1>
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <span>Login With Username & Password</span>
-            <input type="text" id="username" name="username" placeholder="Enter Username" required>
-            <input type="password" id="password" name="password" placeholder="Enter Password" required>
-            <a href="#">Forget Password?</a>
-            <button type="submit">Sign In</button>
-            <div th:if="${param.error}">
-                <p style="color:red;">Неверное имя пользователя или пароль.</p>
+
+
+    <div class="form-container sign-up">
+        <form th:action="@{/process_registration}" th:object="${person}" method="post">
+            <div>
+                <label for="username">Имя пользователя</label>
+                <input type="text" id="username" th:field="*{username}" placeholder="Введите имя пользователя"/>
+                <div class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
             </div>
-            <div th:if="${param.logout}">
-                <p style="color:green;">Вы успешно вышли из аккаунта.</p>
+            <div>
+                <label for="password">Пароль</label>
+                <input type="password" id="password" th:field="*{password}" placeholder="Введите пароль"/>
+                <div class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
             </div>
+            <div>
+                <label for="address">Адрес доставки</label>
+                <input type="text" id="address" th:field="*{address}" placeholder="Введите адрес доставки"/>
+                <div class="error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
+            </div>
+            <div>
+                <label for="phoneNumber">Номер телефона</label>
+                <input type="text" id="phoneNumber" th:field="*{phoneNumber}" placeholder="Введите номер телефона"/>
+                <div class="error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></div>
+            </div>
+            <div>
+                <label for="email">Email</label>
+                <input type="email" id="email" th:field="*{email}" placeholder="Введите email"/>
+                <div class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+            </div>
+            <button type="submit">Зарегистрироваться</button>
         </form>
     </div>
 
-    <div class="form-container sign-up">
-        <form action="/process_registration" method="post" th:object="${person}">
-            <h1>Создать аккаунт</h1>
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <span style="margin-top:20px;">Зарегестрироваться с помощью логина</span>
-            <input class="form-input" type="text" th:field="*{username}" id="username" placeholder="Name" th:classappend="${#fields.hasErrors('username')} ? 'error' : 'form-input'"/>
-            <div class="form-error" th:if="${#fields.hasErrors('username')}" th:text="${#fields.errors('username').get(#fields.errors('username').size() - 1)}"></div>
-            <input class="form-input" type="password" th:field="*{password}" id="password" placeholder="Enter Password" th:classappend="${#fields.hasErrors('password')} ? 'error' : 'form-input'"/>
-            <div class="form-error" th:if="${#fields.hasErrors('password')}" th:text="${#fields.errors('password').get(#fields.errors('password').size() - 1)}"></div>
-            <button>зарегестрироваться</button>
-        </form>
-    </div>
 
     <div class="toggle-container">
         <div class="toggle">
@@ -274,13 +277,12 @@
     const registerBtn = document.getElementById('register');
     const loginBtn = document.getElementById('login');
 
-    registerBtn.addEventListener('click', () => {
-        container.classList.add("active");
-    });
+    if (registerBtn) {
+        registerBtn.addEventListener('click', () => {
+            container.classList.add("active");
+        });
+    }
 
-    loginBtn.addEventListener('click', () => {
-        container.classList.remove("active");
-    });
 </script>
 </body>
 
