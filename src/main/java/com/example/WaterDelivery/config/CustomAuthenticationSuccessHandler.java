@@ -1,4 +1,5 @@
 package com.example.WaterDelivery.config;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -10,7 +11,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         String referer = request.getParameter("referer");
-        String redirectURL = (referer != null && !referer.isEmpty()) ? referer : "/";
+        // По умолчанию перенаправляем на страницу каталога
+        String redirectURL = (referer != null && !referer.isEmpty()) ? referer : "/catalog";
         response.sendRedirect(redirectURL);
     }
 }

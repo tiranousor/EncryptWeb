@@ -18,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Controller
@@ -44,6 +45,14 @@ public class MainController {
         } model.addAttribute("waterBottle",waterBottleService.findAll());
         return "home";
     }
+    @GetMapping("/catalog")
+    public String showCatalog(Model model,  Authentication authentication) {
+        if (authentication != null) {
+            model.addAttribute("person_id", personService.getPerson(authentication.getName()).get().getId());
+        } model.addAttribute("waterBottle",waterBottleService.findAll());
+        return "catalog";
+    }
+
 
     @GetMapping("/login")
     public String showLoginPage() {

@@ -166,7 +166,7 @@
     </th:block>
 
     <div th:if="${#lists.isEmpty(orders)}">
-        <a href="/" class="back-button">Вернуться к каталогу</a>
+        <a href="/catalog" class="back-button">Вернуться к каталогу</a>
     </div>
     <div th:if="${!#lists.isEmpty(orders)}" class="total-price" th:text="'Итого: ' + ${totalOrderPrice} + ' руб.'">Итого: 500 руб.</div>
     <div th:if="${!#lists.isEmpty(orders)}">
