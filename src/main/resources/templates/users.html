@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users Orders</title>
+    <title>Пользователи и Заказы</title>
     <style>
+        /* Добавь стили по своему усмотрению */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -16,14 +16,14 @@
             text-align: center;
             display: flex;
             height: 70px;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border: 1px solid #ddd;
             position: fixed;
             top: 0;
             width: 100%;
-            z-index: 1000;
+            z-index:1000;
         }
         .header-title {
             color: white;
@@ -31,8 +31,87 @@
             text-align: center;
             text-transform: uppercase;
         }
+        .header-icons {
+            display: flex;
+            position:absolute;
+            top:27px;
+            right:90px;
+            align-items: center;
+            background-color: white;
+            z-index:1000;
+        }
+        .header-icons a {
+            margin: 0 20px;
+            background-color: white;
+        }
+        .container {
+            padding: 120px 60px 60px 150px;
+            display: flex;
+            flex-direction: column;
+            margin: 0 auto;
+            max-width: 1200px;
+        }
+        h1 {
+            color: #343a40;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #F5F6F8;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #7E56C8;
+            color: white;
+        }
+        td ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        td ul li {
+            margin-bottom: 10px;
+        }
+        td ul li .cart-item {
+            display: flex;
+            align-items: center;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 5px 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        td ul li .cart-item img {
+            width: 50px;
+            height: 70px;
+            margin-right: 15px;
+            border: 1px solid grey;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+        td ul li .cart-item .cart-item-info {
+            display: flex;
+            flex-direction: column;
+        }
+        td ul li .cart-item .cart-item-info .cart-item-title {
+            font-weight: bold;
+        }
+        td ul li .cart-item .cart-item-info .cart-item-quantity {
+            color: #777;
+        }
+        td ul li .cart-item .cart-item-info .cart-item-price {
+            color: #343a40;
+            font-weight: bold;
+        }
         .back-button {
-            margin-top: 80px;
+            margin-top: 20px;
             display: inline-block;
             padding: 10px 20px;
             background-color: #7E56C8;
@@ -40,333 +119,81 @@
             text-decoration: none;
             border-radius: 32px;
             transition: background-color 0.3s ease;
+            align-self: center;
         }
         .back-button:hover {
             background-color: #5e3ea6;
         }
-        .container {
-            padding: 120px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            max-width: 1000px;
-        }
-        .person-section {
-            width: 100%;
-            margin-bottom: 30px;
-            background-color: #F5F6F8;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            border-radius: 32px;
-        }
-        .person-name {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #343a40;
-        }
-        .cart-item {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 32px;
-            padding: 10px;
-            margin-bottom: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .cart-item td {
-            padding: 10px;
-            vertical-align: top;
-        }
-        .cart-item ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .cart-item ul li {
-            margin-bottom: 10px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 32px;
-            display: flex;
-            flex-direction: column;
-        }
-        .cart-item ul li .book-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-        .cart-item ul li .book-item img {
-            width: 50px;
-            height: 70px;
-            margin-right: 15px;
-            border: 1px solid grey;
-            border-radius: 35px;
-            object-fit: cover;
-        }
-        .cart-item ul li .book-info {
-            display: flex;
-            flex-direction: column;
-        }
-        .cart-item ul li .book-title {
-            font-weight: bold;
-        }
-        .cart-item ul li .book-quantity {
-            color: #777;
-        }
-        .cart-item ul li .book-price {
-            color: #343a40;
-            font-weight: bold;
-        }
         .order-status {
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-        }
-        .order-status select {
             padding: 5px 10px;
             border-radius: 32px;
-            border: 1px solid #ddd;
-            background-color: white;
-            margin-right: 10px;
-            font-size: 1em;
-            color: #343a40;
-        }
-        .order-status button {
-            background-color: #7E56C8;
-            border: none;
+            font-weight: bold;
+            display: inline-block;
             color: white;
-            padding: 5px 15px;
-            cursor: pointer;
-            border-radius: 32px;
-            transition: background-color 0.3s ease;
-            font-size: 1em;
         }
-        .order-status button:hover {
-            background-color: #5e3ea6;
-        }
-        footer {
-            padding: 20px;
-            text-align: center;
+        .status-Оформлен {
             background-color: #7E56C8;
-            color: white;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
         }
-        #nav-container {
-            position: fixed;
-            height: 100vh;
-            width: 100%;
-            pointer-events: none;
+        .status-Впути {
+            background-color: #f19e4c;
         }
-        #nav-container .bg {
-            position: absolute;
-            top: 70px;
-            left: 0;
-            width: 100%;
-            height: calc(100% - 70px);
-            visibility: hidden;
-            opacity: 0;
-            transition: .3s;
-            background: #000;
-        }
-        #nav-container:focus-within .bg {
-            visibility: visible;
-            opacity: .6;
-        }
-        #nav-container * {
-            visibility: visible;
-        }
-
-        .button {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            z-index: 1;
-            -webkit-appearance: none;
-            border: 0;
-            background: transparent;
-            border-radius: 0;
-            height: 70px;
-            width: 30px;
-            cursor: pointer;
-            pointer-events: auto;
-            margin-left: 25px;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: rgba(0,0,0,0);
-        }
-        .icon-bar {
-            display: block;
-            width: 100%;
-            height: 3px;
-            background: white;
-            transition: .3s;
-        }
-        .icon-bar + .icon-bar {
-            margin-top: 5px;
-        }
-
-        #nav-container:focus-within .button {
-            pointer-events: none;
-        }
-        #nav-container:focus-within .icon-bar:nth-of-type(1) {
-            transform: translate3d(0,8px,0) rotate(45deg);
-        }
-        #nav-container:focus-within .icon-bar:nth-of-type(2) {
-            opacity: 0;
-        }
-        #nav-container:focus-within .icon-bar:nth-of-type(3) {
-            transform: translate3d(0,-8px,0) rotate(-45deg);
-        }
-
-        #nav-content {
-            margin-top: 70px;
-            padding: 20px;
-            width: 90%;
-            max-width: 300px;
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: calc(100% - 70px);
-            background: #ececec;
-            pointer-events: auto;
-            -webkit-tap-highlight-color: rgba(0,0,0,0);
-            transform: translateX(-100%);
-            transition: transform .3s;
-            will-change: transform;
-            contain: paint;
-        }
-
-        #nav-content ul {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        #nav-content li a {
-            padding: 10px 5px;
-            display: block;
-            text-transform: uppercase;
-            transition: color .1s;
-            color: #333;
-        }
-
-        #nav-content li a:hover {
-            color: #7E56C8;
-        }
-
-        #nav-container:focus-within #nav-content {
-            transform: none;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        a,
-        a:visited,
-        a:focus,
-        a:active,
-        a:link {
-            text-decoration: none;
-            outline: 0;
-        }
-
-        a {
-            color: currentColor;
-            transition: .2s ease-in-out;
-        }
-
-        ul {
-            padding: 0;
-            list-style: none;
+        .status-Доставлен {
+           background-color: #6bcb43;
         }
     </style>
 </head>
 <body>
-<header><h1 class="header-title">Заказы пользователей</h1></header>
-<div id="nav-container" style="z-index:9999;">
-    <div class="bg"></div>
-    <div class="button" style="color:white;" tabindex="0">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
+<header>
+    <h1 class="header-title">Пользователи и Заказы</h1>
+    <div class="header-icons">
+        <a href="/admin/add-water-bottle"><button class="add-button">Добавить Бутылку</button></a>
+        <form th:action="@{/logout}" th:method="POST">
+            <button type="submit" class="add-button" style="background-color: #FF6B6B;">Выход</button>
+        </form>
     </div>
-    <div id="nav-content" tabindex="0">
-        <div sec:authorize="hasRole('ROLE_ADMIN')">
-            <ul>
-                <li><a href="/">Главная</a></li>
-                <li><a href="/add-book">Добавить</a></li>
-                <li><a href="/bookDetails">Редактировать</a></li>
-                <li><a href="/users">Заказы</a></li>
-                <li>
-                    <form th:action="@{/logout}" th:method="POST">
-                        <input style="background-color: transparent; border: 0; padding: 10px 5px; display: block; text-transform: uppercase; transition: color .1s; color: #333;" onmouseover="this.style.color='#7E56C8';" onmouseout="this.style.color='#333';" type="submit" value="Выход">
-                    </form>
-                </li>
-            </ul>
-        </div>
-        <div sec:authorize="hasRole('ROLE_USER')">
-            <ul>
-                <li><a href="/">Главная</a></li>
-                <li><a href="/cart">Корзина</a></li>
-                <li><a href="/my-orders">Заказы</a></li>
-                <li>
-                    <form th:action="@{/logout}" th:method="POST">
-                        <input style="background-color: transparent; border: 0; padding: 10px 5px; display: block; text-transform: uppercase; transition: color .1s; color: #333;" onmouseover="this.style.color='#7E56C8';" onmouseout="this.style.color='#333';" type="submit" value="Выход">
-                    </form>
-                </li>
-            </ul>
-        </div>
-    </div>
-</div>
-<a href="/" class="back-button" style="position:relative; left:45%;">Вернуться назад</a>
+</header>
 
 <div class="container">
-    <th:block th:each="entry : ${personOrdersMap}">
-        <div class="person-section">
-            <div class="person-name" th:text="${entry.key.username}"></div>
-            <th:block th:each="order : ${entry.value}">
-                <div class="cart-item">
-                    <td><strong>Дата:</strong> <span th:text="${#temporals.format(order.orderDate, 'dd-MM-yyyy')}"></span> <strong>Время:</strong> <span th:text="${#temporals.format(order.orderDate, 'HH:mm:ss')}"></span></td>
-                    <div><strong>Стоимость: </strong><span th:text="${order.totalOrderPrice}"></span></div>
-                    <div>
-                        <strong>Предметы заказа:</strong>
-                        <ul>
-                            <li th:each="item : ${order.orderItems}">
-                                <div class="book-item">
-                                    <img th:src="${item.book.url}" alt="Book Cover">
-                                    <div class="book-info">
-                                        <div class="book-title" th:text="${item.book.name}"></div>
-                                        <div class="book-quantity" th:text="'Количество: ' + ${item.quantity}"></div>
-                                        <div class="book-price" th:text="'Стоимость: ' + ${item.totalPrice}"></div>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="order-status">
-                        <form th:action="@{/updateOrderStatus}" th:method="post">
-                            <input type="hidden" name="orderId" th:value="${order.id}"/>
-                            <select name="status">
-                                <option value="Оформлен" th:selected="${order.status == 'Оформлен'}">Оформлен</option>
-                                <option value="В пути" th:selected="${order.status == 'В пути'}">В пути</option>
-                                <option value="Доставлен" th:selected="${order.status == 'Доставлен'}">Доставлен</option>
-                            </select>
-                            <button type="submit">Обновить</button>
-                        </form>
-                    </div>
-                </div>
-            </th:block>
-        </div>
-    </th:block>
+    <h1>Все Заказы Пользователей</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Пользователь</th>
+            <th>Заказы</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${personOrdersMap.entrySet()}">
+            <td th:text="${entry.key.username}">Username</td>
+            <td>
+                <ul>
+                    <li th:each="order : ${entry.value}">
+                        <div class="cart-item">
+                            <div class="cart-item-info">
+                                <div class="cart-item-title">Заказ № <span th:text="${order.id}">1</span></div>
+                                <div class="cart-item-price">Итого: <span th:text="${order.totalOrderPrice}">500 руб.</span></div>
+                                <div class="cart-item-quantity">Дата: <span th:text="${#temporals.format(order.orderDate, 'dd-MM-yyyy HH:mm:ss')}">01-01-2024 12:00:00</span></div>
+                                <div class="order-status" th:class="'status-' + ${order.status}" th:text="${order.status}">Оформлен</div>
+                            </div>
+                            <div class="action-links">
+                                <form th:action="@{/updateOrderStatus}" method="post">
+                                    <input type="hidden" name="orderId" th:value="${order.id}" />
+                                    <select name="status">
+                                        <option value="Оформлен" th:selected="${order.status == 'Оформлен'}">Оформлен</option>
+                                        <option value="Впути" th:selected="${order.status == 'Впути'}">Впути</option>
+                                        <option value="Доставлен" th:selected="${order.status == 'Доставлен'}">Доставлен</option>
+                                    </select>
+                                    <button type="submit">Обновить Статус</button>
+                                </form>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <a href="/" class="back-button">Вернуться к Главной</a>
 </div>
-
-
 </body>
 </html>

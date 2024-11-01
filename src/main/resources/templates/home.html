@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Доставка воды</title>
+    <link href='https://unpkg.com/css.gg@2.0.0/icons/css/log-in.css' rel='stylesheet'>
+    <link href='https://unpkg.com/css.gg@2.0.0/icons/css/log-out.css' rel='stylesheet'>
+    <style>
+        /* Добавь сюда твои стили или используй существующие */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: white;
+        }
+        header {
+            background: linear-gradient(70deg, #CAEDA7,  #7E56C8);
+            text-align: center;
+            display: flex;
+            height: 70px;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index:1000;
+        }
+        .header-title {
+            color: white;
+            flex: 1;
+            text-align: center;
+            text-transform: uppercase;
+        }
+        .header-icons {
+            display: flex;
+            position:absolute;
+            top:27px;
+            right:90px;
+            align-items: center;
+            background-color: white;
+            z-index:1000;
+        }
+        .header-icons a {
+            margin: 0 20px;
+            background-color: white;
+        }
+        .container {
+            padding: 120px 0 0 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 auto;
+        }
+        .water-item {
+            width: 300px;
+            padding: 20px;
+            background-color: #F5F6F8;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .water-item img {
+            width: 200px;
+            height: 300px;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+        .water-price {
+            font-size: 1.5em;
+            color: #7E56C8;
+            margin: 15px 0;
+        }
+        .buy-button {
+            background-color: #7E56C8;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 32px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        .buy-button:hover {
+            background-color: #63419F;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1 class="header-title">Доставка воды</h1>
+    <div sec:authorize="isAuthenticated()" class="header-icons">
+        <a href="/cart"><i class="gg-cart"></i></a>
+        <a href="/my-orders"><i class="gg-list"></i></a>
+        <form th:action="@{/logout}" th:method="POST">
+            <button type="submit" class="buy-button">Выход</button>
+        </form>
+    </div>
+    <div sec:authorize="!isAuthenticated()" class="header-icons">
+        <a href="/login"><i class="gg-log-in"></i></a>
+    </div>
+</header>
+<div class="container">
+    <div th:each="waterBottle : ${waterBottle}" class="water-item">
+        <img th:src="${waterBottle.url}" alt="Бутылка воды">
+        <div class="water-price" th:text="'Цена: ' + ${waterBottle.price} + ' руб.'">Цена: 500 руб.</div>
+        <div sec:authorize="hasRole('ROLE_USER')">
+            <meta name="_csrf" th:content="${_csrf.token}"/>
+            <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+            <button class="buy-button"
+                    th:data-person-id="${person_id}"
+                    th:data-waterBottle-id="${waterBottle.id}"
+                    id="buyButton">
+                Купить воду
+            </button>
+        </div>
+        <div sec:authorize="isAnonymous()">
+            <a th:href="@{/login}" class="buy-button">Войти, чтобы купить</a>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function addToCart(personId, waterBottleId, csrfToken) {
+        fetch(`/add-order/${personId}/${waterBottleId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .then(response => response.text())
+        .then(data => {
+            if (data === "Item added to cart") {
+                let button = document.getElementById('buyButton');
+                button.innerText = "Перейти в корзину";
+                button.onclick = () => window.location.href = '/cart';
+                button.classList.add('go-to-cart');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        document.getElementById('buyButton').addEventListener('click', function() {
+            const personId = this.getAttribute('data-person-id');
+            const waterBottleId = this.getAttribute('data-waterBottle-id');
+            addToCart(personId, waterBottleId, csrfToken);
+        });
+    });
+</script>
+</body>
+</html>

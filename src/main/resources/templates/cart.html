@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Корзина</title>
     <style>
+        /* Добавь сюда стили или используй существующие */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -16,29 +16,40 @@
             text-align: center;
             display: flex;
             height: 70px;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border: 1px solid #ddd;
             position: fixed;
             top: 0;
             width: 100%;
-            z-index: 1000;
+            z-index:1000;
         }
         .header-title {
-                        color: white;
-
+            color: white;
             flex: 1;
             text-align: center;
             text-transform: uppercase;
         }
+        .header-icons {
+            display: flex;
+            position:absolute;
+            top:27px;
+            right:90px;
+            align-items: center;
+            background-color: white;
+            z-index:1000;
+        }
+        .header-icons a {
+            margin: 0 20px;
+            background-color: white;
+        }
         .container {
-            padding: 30px;
+            padding: 120px 60px 0 150px;
             display: flex;
             flex-direction: column;
-            margin-left: 150px;
-            margin-right: 150px;
-            margin-top: 100px;
+            margin: 0 auto;
+            max-width: 800px;
         }
         .cart-item {
             display: flex;
@@ -60,14 +71,9 @@
             font-size: 1.2em;
             font-weight: bold;
         }
-        .cart-item-author {
-            font-size: 1em;
-            color: #555;
-        }
         .cart-item-price {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #CAEDA7;
+            font-size: 1em;
+            color: #7E56C8;
         }
         .cart-item-quantity {
             display: flex;
@@ -81,6 +87,7 @@
             padding: 5px 10px;
             cursor: pointer;
             border-radius: 32px;
+            text-decoration: none;
         }
         .quantity-button:hover {
             background-color: #63419F;
@@ -94,7 +101,6 @@
             font-weight: bold;
             text-align: right;
             margin: 20px 0;
-            margin-left:50px;
         }
         .button-style {
             background-color: #7E56C8;
@@ -107,18 +113,13 @@
             font-size: 18px;
             cursor: pointer;
             transition: background-color 0.15s;
+            align-self: flex-end;
         }
         .button-style:hover {
             background-color: #63419F;
         }
-        .summary {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-        }
         .back-button {
-            margin-top: 80px;
+            margin-top: 20px;
             display: inline-block;
             padding: 10px 20px;
             background-color: #7E56C8;
@@ -130,243 +131,49 @@
         .back-button:hover {
             background-color: #5e3ea6;
         }
-
-        #nav-container {
-            position: fixed;
-            height: 100vh;
-            width: 100%;
-            pointer-events: none;
-        }
-        #nav-container .bg {
-            position: absolute;
-            top: 70px;
-            left: 0;
-            width: 100%;
-            height: calc(100% - 70px);
-            visibility: hidden;
-            opacity: 0;
-            transition: .3s;
-            background: #000;
-        }
-        #nav-container:focus-within .bg {
-            visibility: visible;
-            opacity: .6;
-        }
-        #nav-container * {
-            visibility: visible;
-        }
-
-        .button {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            z-index: 1;
-            -webkit-appearance: none;
-            border: 0;
-            background: transparent;
-            border-radius: 0;
-            height: 70px;
-            width: 30px;
-            cursor: pointer;
-            pointer-events: auto;
-            margin-left: 25px;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: rgba(0,0,0,0);
-        }
-        .icon-bar {
-            display: block;
-            width: 100%;
-            height: 3px;
-            background: white;
-            transition: .3s;
-        }
-        .icon-bar + .icon-bar {
-            margin-top: 5px;
-        }
-
-        #nav-container:focus-within .button {
-            pointer-events: none;
-        }
-        #nav-container:focus-within .icon-bar:nth-of-type(1) {
-            transform: translate3d(0,8px,0) rotate(45deg);
-        }
-        #nav-container:focus-within .icon-bar:nth-of-type(2) {
-            opacity: 0;
-        }
-        #nav-container:focus-within .icon-bar:nth-of-type(3) {
-            transform: translate3d(0,-8px,0) rotate(-45deg);
-        }
-
-        #nav-content {
-            margin-top: 70px;
-            padding: 20px;
-            width: 90%;
-            max-width: 300px;
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: calc(100% - 70px);
-            background: #ececec;
-            pointer-events: auto;
-            -webkit-tap-highlight-color: rgba(0,0,0,0);
-            transform: translateX(-100%);
-            transition: transform .3s;
-            will-change: transform;
-            contain: paint;
-        }
-
-        #nav-content ul {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        #nav-content li a {
-            padding: 10px 5px;
-            display: block;
-            text-transform: uppercase;
-            transition: color .1s;
-            color: #333;
-        }
-
-        #nav-content li a:hover {
-            color: #7E56C8;
-        }
-
-        #nav-container:focus-within #nav-content {
-            transform: none;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        a,
-        a:visited,
-        a:focus,
-        a:active,
-        a:link {
-            text-decoration: none;
-            outline: 0;
-        }
-
-        a {
-            color: currentColor;
-            transition: .2s ease-in-out;
-        }
-
-        ul {
-            padding: 0;
-            list-style: none;
-        }
     </style>
 </head>
 <body>
-<header><h1 class=" header-title">Корзина</h1></header>
-<div id="nav-container" style="z-index:9999;">
-    <div class="bg"></div>
-    <div class="button"style="color:white;" tabindex="0">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
+<header>
+    <h1 class="header-title">Корзина</h1>
+    <div sec:authorize="isAuthenticated()" class="header-icons">
+        <a href="/cart"><i class="gg-cart"></i></a>
+        <a href="/my-orders"><i class="gg-list"></i></a>
+        <form th:action="@{/logout}" th:method="POST">
+            <button type="submit" class="button-style">Выход</button>
+        </form>
     </div>
-    <div id="nav-content" tabindex="0">
-        <div sec:authorize="hasRole('ROLE_ADMIN')">
-            <ul>
-                <li> <a href="/">Главная</a></li>
-                <li> <a href="/add-book">Добавить</a></li>
-                <li>  <a href="/bookDetails">Редактировать</a></li>
-                <li> <a href="/users">Заказы</a></li>
-                <li>
-                    <form th:action="@{/logout}" th:method="POST" >
-                        <input  style="background-color: transparent;border:0;       padding: 10px 5px;
-                            display: block;
-                            text-transform: uppercase;
-                            transition: color .1s;
-                            color: #333; "  onmouseover="this.style.color=' #7E56C8';" onmouseout="this.style.color='#333';"
-                                type="submit" value="Выход">
-                    </form>
-                </li>
-            </ul>
-        </div>
-        <div sec:authorize="hasRole('ROLE_USER')" >
-            <ul>
-                <li> <a href="/">Главная</a></li>
-                <li>  <a href="/cart">Корзина</a></li>
-                <li> <a href="/my-orders">Заказы</a></li>
-                <li>
-                    <form th:action="@{/logout}" th:method="POST" >
-                        <input  style="background-color: transparent;border:0;       padding: 10px 5px;
-                            display: block;
-                            text-transform: uppercase;
-                            transition: color .1s;
-                            color: #333; "  onmouseover="this.style.color=' #7E56C8';" onmouseout="this.style.color='#333';"
-                                type="submit" value="Выход">
-                    </form>
-                </li>
-            </ul>
-        </div>
+    <div sec:authorize="!isAuthenticated()" class="header-icons">
+        <a href="/login"><i class="gg-log-in"></i></a>
     </div>
-</div>
-<div th:if="${#lists.isEmpty(orders)}">
-    <a href="/" class="back-button" style="position:relative;  left:43%;">Вернуться к каталогу</a>
-</div>
-<div class="container">
+</header>
 
+<div class="container">
     <th:block th:each="order : ${orders}">
         <div class="cart-item">
-            <img th:src="${order.book.url}" alt="Book Cover">
+            <img th:src="${order.waterBottle.url}" alt="Бутылка воды">
             <div class="cart-item-info">
-                <div class="cart-item-title" th:text="${order.book.name}"></div>
-                <div class="cart-item-author" th:text="${order.book.author}"></div>
-                <div class="cart-item-price" th:text="${order.book.price}"></div>
+                <div class="cart-item-title">Бутылка воды {{ ${order.waterBottle.sizeLiters} }} л</div>
+                <div class="cart-item-price" th:text="'Цена: ' + ${order.waterBottle.price} + ' руб.'">Цена: 500 руб.</div>
             </div>
             <div class="cart-item-quantity">
-                <a class="quantity-button" th:href="@{'/cartQuantityUpdate?sy=-&oId='+${order.id}}" style="color: white; text-decoration: none;">-</a>
-                <div class="quantity-input">[[${order.quantity}]]</div>
-                <a class="quantity-button" th:href="@{'/cartQuantityUpdate?sy=in&oId='+${order.id}}" style="color: white; text-decoration: none;">+</a>
+                <a class="quantity-button" th:href="@{'/cartQuantityUpdate?sy=-&oId=' + ${order.id}}">-</a>
+                <div class="quantity-input" th:text="${order.quantity}">1</div>
+                <a class="quantity-button" th:href="@{'/cartQuantityUpdate?sy=in&oId=' + ${order.id}}">+</a>
             </div>
-            <div class="total-price" th:text="${order.totalPrice}"></div>
-
-
+            <div class="total-price" th:text="${order.totalPrice}">500 руб.</div>
         </div>
     </th:block>
+
     <div th:if="${#lists.isEmpty(orders)}">
-        <div class="summary">
-            <a href="/my-orders" style="position:absolute; left:45%; top:30%" class="button-style">Мои заказы</a>
-        </div>
+        <a href="/" class="back-button">Вернуться к каталогу</a>
     </div>
-<!--    <div class="summary">-->
-<!--        <div class="total-price" th:text="${totalOrderPrice}"></div>-->
-<!--    </div>-->
-    <div> </div>
-    <div th:if="${not #lists.isEmpty(orders)}">
-    <form style=" position:relative;  top 180px; left:93%" th:method="POST" th:action="@{/cart}">
-        <input class="button-style" style="" type="submit" value="заказать"/>
-    </form>
+    <div th:if="${!#lists.isEmpty(orders)}" class="total-price" th:text="'Итого: ' + ${totalOrderPrice} + ' руб.'">Итого: 500 руб.</div>
+    <div th:if="${!#lists.isEmpty(orders)}">
+        <form th:method="POST" th:action="@{/cart}">
+            <button type="submit" class="button-style">Заказать</button>
+        </form>
     </div>
-
-<!--    <div class="summary">-->
-<!--        <form th:method="POST" th:action="@{/applyPromoCode}">-->
-<!--            <input type="text" name="promoCode" placeholder="Enter Promo Code">-->
-<!--            <input class="button-style" type="submit" value="Apply Promo Code">-->
-<!--        </form>-->
-<!--    </div>-->
-
-    <div class="summary">
-        <div class="total-price" th:text="${totalOrderPrice}"></div>
-    </div>
-
-<!--    <div th:if="${not #lists.isEmpty(orders)}">-->
-<!--        <form th:method="POST" th:action="@{/cart}">-->
-<!--            <input type="hidden" name="promoCode" value="${appliedPromoCode}">-->
-<!--            <input class="button-style" type="submit" value="Order">-->
-<!--        </form>-->
-<!--    </div>-->
 </div>
-
 </body>
 </html>

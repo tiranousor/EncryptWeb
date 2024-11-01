@@ -2,7 +2,7 @@
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Список Бутылей Воды</title>
+    <title>Детали Бутылек Воды</title>
     <style>
         /* Добавь стили по своему усмотрению */
         body {
@@ -95,7 +95,7 @@
 </head>
 <body>
 <header>
-    <h1 class="header-title">Список Бутылей Воды</h1>
+    <h1 class="header-title">Детали Бутылек Воды</h1>
     <div class="header-icons">
         <a href="/admin/add-water-bottle"><button class="add-button">Добавить Бутылку</button></a>
         <form th:action="@{/logout}" th:method="POST">
@@ -118,7 +118,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="waterBottle : ${waterBottles}">
+        <tr th:each="waterBottle : ${waterBottleList}">
             <td th:text="${waterBottle.id}">1</td>
             <td th:text="${waterBottle.sizeLiters}">20</td>
             <td th:text="${waterBottle.price}">500.0</td>
