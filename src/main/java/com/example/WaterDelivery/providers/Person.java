@@ -28,6 +28,11 @@ public class Person {
     @NotEmpty(message = "Пароль не должен быть пустым")
     @Column(name = "password", nullable = false)
     private String password;
+    @Column(name="avatarUrl")
+    private String avatarUrl;
+
+    @Column(name="about")
+    private String about;
 
     @Column(name = "role", nullable = false)
     private String role = "ROLE_USER";

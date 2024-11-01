@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Мои заказы</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль пользователя</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
-        /* Унифицированные стили для каталога и страницы заказов */
         body {
             font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
@@ -15,145 +16,151 @@
             flex-direction: column;
             align-items: center;
         }
-        header {
-            background: linear-gradient(70deg, #0091ea, #00bcd4);
-            text-align: center;
-            display: flex;
-            height: 70px;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border: 1px solid #ddd;
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
-        .header-title {
-            color: white;
-            flex: 1;
-            text-align: center;
-            text-transform: uppercase;
-            font-size: 1.8em;
-            margin: 0;
-        }
-        .header-icons {
-            display: flex;
-            position: absolute;
-            top: 20px;
-            right: 90px;
-            align-items: center;
-            background-color: transparent;
-            z-index: 1000;
-        }
-        .header-icons a {
-            margin: 0 20px;
-            background-color: transparent;
-        }
+
         .container {
-            padding: 120px 60px;
             display: flex;
-            flex-direction: column;
+            flex-wrap: wrap;
+            gap: 30px;
             max-width: 1200px;
             width: 100%;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 100px;
         }
-        h1 {
-            color: #00796b;
-            margin-bottom: 30px;
+
+        .profile-section {
+            flex: 1;
+            padding: 20px;
+            border-right: 2px solid #e0e0e0;
+        }
+
+        .profile-header {
             text-align: center;
+            margin-bottom: 20px;
         }
+
+        .profile-header img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #00bcd4;
+            box-shadow: 0 4px 10px rgba(0, 145, 234, 0.3);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .profile-header img:hover {
+            box-shadow: 0 6px 16px rgba(0, 145, 234, 0.5);
+        }
+
+        .profile-header h2 {
+            margin-top: 15px;
+            font-size: 1.4em;
+            color: #0091ea;
+        }
+
+        .profile-details {
+            margin-top: 20px;
+        }
+
+        .profile-details p {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .profile-details span {
+            font-weight: 500;
+            color: #00796b;
+        }
+
+        .orders-section {
+            flex: 2;
+            padding: 20px;
+        }
+
+        .orders-header {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .orders-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0091ea;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            background-color: #ffffff;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
         }
+
         th, td {
-            padding: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
             text-align: left;
-            border-bottom: 1px solid #ddd;
         }
+
         th {
             background-color: #0091ea;
             color: white;
         }
-        td ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        td ul li {
-            margin-bottom: 10px;
-        }
-        td ul li .cart-item {
+
+        .cart-item {
             display: flex;
             align-items: center;
-            background-color: #f5f6f8;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 10px;
-            margin: 5px 0;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            gap: 15px;
         }
-        td ul li .cart-item:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-        td ul li .cart-item img {
+
+        .cart-item img {
             width: 50px;
-            height: 70px;
-            margin-right: 15px;
+            height: 50px;
+            object-fit: cover;
             border: 1px solid #ddd;
             border-radius: 5px;
-            object-fit: cover;
         }
-        td ul li .cart-item .cart-item-info {
+
+        .cart-item-info {
             display: flex;
             flex-direction: column;
         }
-        td ul li .cart-item .cart-item-info .cart-item-title {
-            font-weight: bold;
-            color: #00796b;
-        }
-        td ul li .cart-item .cart-item-info .cart-item-quantity {
-            color: #777;
-        }
-        td ul li .cart-item .cart-item-info .cart-item-price {
-            color: #343a40;
-            font-weight: bold;
-        }
-        .back-button {
-            margin-top: 20px;
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #0091ea;
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            transition: background-color 0.3s ease;
-            align-self: center;
-        }
-        .back-button:hover {
-            background-color: #0070c0;
-        }
+
         .order-status {
             padding: 5px 10px;
-            border-radius: 25px;
-            font-weight: bold;
-            display: inline-block;
+            border-radius: 5px;
+            text-align: center;
             color: white;
+            font-weight: 600;
         }
+
         .status-Оформлен {
-            background-color: #7E56C8;
+            background-color: #4caf50;
         }
-        .status-Впути {
-            background-color: #f19e4c;
+
+        .status-Выполняется {
+            background-color: #ff9800;
         }
-        .status-Доставлен {
-            background-color: #6bcb43;
+
+        .status-Отменен {
+            background-color: #f44336;
         }
+        .edit-profile-button {
+    display: inline-block;
+    background-color: #0091ea;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.edit-profile-button:hover {
+    background-color: #0070c0;
+}
                   header {
             background: linear-gradient(70deg, #0091ea, #00bcd4);
             text-align: center;
@@ -262,7 +269,7 @@
 </head>
 <body>
 <header>
-    <h1 class="header-title">Мои заказы</h1>
+    <h1 class="header-title">Доставка Воды</h1>
     </div>
 </header>
 <div class="menu-button" tabindex="0">
@@ -276,7 +283,7 @@
         <div sec:authorize="hasRole('ROLE_ADMIN')">
             <ul>
                 <li></li>
-                <li> <a href="/catalog">Главная</a></li>
+                <li> <a href="/">Главная</a></li>
                 <li> <a href="/add-book">Добавить</a></li>
                 <li>  <a href="/bookDetails">Редактировать</a></li>
                 <li> <a href="/users">Заказы</a></li>
@@ -289,9 +296,8 @@
         </div>
         <div sec:authorize="hasRole('ROLE_USER')">
             <ul>
-                <li><span sec:authentication="name"></span></li>
-                <li> <a href="/catalog">Главная</a></li>
-
+                <li><a href="/userProfile" sec:authentication="name"></a></li>
+                <li> <a href="/">Главная</a></li>
                 <li>  <a href="/cart">Корзина</a></li>
                 <li> <a href="/my-orders">Заказы</a></li>
                 <li>
@@ -304,48 +310,65 @@
     </div>
 </div>
 <div class="bg"></div>
-
-
 <div class="container">
-    <h1>Ваши заказы</h1>
-    <table>
-        <thead>
-        <tr>
-            <th>Дата заказа</th>
-            <th>Общая стоимость</th>
-            <th>Детали заказа</th>
-            <th>Статус</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="order : ${orders}">
-            <td>
-                <span>Дата:</span> <p th:text="${#temporals.format(order.orderDate, 'dd-MM-yyyy')}"></p>
-                <span>Время:</span> <p th:text="${#temporals.format(order.orderDate, 'HH:mm:ss')}"></p>
-            </td>
-            <td th:text="${order.totalOrderPrice}">500 руб.</td>
-            <td>
-                <ul>
-                    <li th:each="item : ${order.orderItems}">
-                        <div class="cart-item">
-                            <img th:src="${item.waterBottle.url}" alt="Бутылка воды">
-                            <div class="cart-item-info">
-                                <div class="cart-item-title" th:text="${item.waterBottle.sizeLiters} + ' л'">20 л</div>
-                                <div class="cart-item-quantity" th:text="'Количество: ' + ${item.quantity}">Количество: 1</div>
-                                <div class="cart-item-price" th:text="'Стоимость: ' + ${item.totalPrice} + ' руб.'">Стоимость: 500 руб.</div>
+    <div class="profile-section">
+        <div class="profile-header">
+            <img th:src="${person.avatarUrl != null ? person.avatarUrl : '/noAvatar.png'}" alt="Avatar" width="50" height="50">
+            <h2 th:text="${person.username}">Имя пользователя</h2>
+        </div>
+        <div class="profile-details">
+            <p><span>Email:</span> <span th:text="${person.email}">example@example.com</span></p>
+            <p><span>Адрес:</span> <span th:text="${person.address}">Адрес доставки</span></p>
+            <p><span>Телефон:</span> <span th:text="${person.phoneNumber}">+123456789</span></p>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <a th:href="@{'/edit/' + ${person.id}}" class="edit-profile-button">Редактировать Профиль</a>
+        </div>
+    </div>
+
+    <div class="orders-section">
+        <div class="orders-header">
+            <h2>Мои заказы</h2>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                <th>Дата и Время</th>
+                <th>Сумма</th>
+                <th>Товары</th>
+                <th>Статус</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order : ${orders}">
+                <td>
+                    <span>Дата:</span> <p th:text="${#temporals.format(order.orderDate, 'dd-MM-yyyy')}"></p>
+                    <span>Время:</span> <p th:text="${#temporals.format(order.orderDate, 'HH:mm:ss')}"></p>
+                </td>
+                <td th:text="${order.totalOrderPrice}">500 руб.</td>
+                <td>
+                    <ul>
+                        <li th:each="item : ${order.orderItems}">
+                            <div class="cart-item">
+                                <img th:src="${item.waterBottle.url}" alt="Бутылка воды">
+                                <div class="cart-item-info">
+                                    <div class="cart-item-title" th:text="${item.waterBottle.sizeLiters} + ' л'">20 л</div>
+                                    <div class="cart-item-quantity" th:text="'Количество: ' + ${item.quantity}">Количество: 1</div>
+                                    <div class="cart-item-price" th:text="'Стоимость: ' + ${item.totalPrice} + ' руб.'">Стоимость: 500 руб.</div>
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                </ul>
-            </td>
-            <td>
-                <div th:class="'order-status status-' + ${order.status}" th:text="${order.status}">Оформлен</div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <a href="/catalog" class="back-button">Вернуться к каталогу</a>
+                        </li>
+                    </ul>
+                </td>
+                <td>
+                    <div th:class="'order-status status-' + ${order.status}" th:text="${order.status}">Оформлен</div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const menuButton = document.querySelector('.menu-button');

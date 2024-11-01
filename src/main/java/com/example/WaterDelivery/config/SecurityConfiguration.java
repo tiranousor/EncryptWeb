@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 @EnableWebSecurity
 public class SecurityConfiguration {
     private static final String[] AUTH_WHITELIST = {
-            "/", "/login", "/images/**", "/*"
+            "/*", "/", "/login", "/images/**"
     };
     private final UserDetailsService personDetailsService;
     @Autowired

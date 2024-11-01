@@ -8,16 +8,23 @@ import com.example.WaterDelivery.services.CartService;
 import com.example.WaterDelivery.services.OrderService;
 import com.example.WaterDelivery.services.PersonService;
 import com.example.WaterDelivery.services.WaterBottleService;
+import com.example.WaterDelivery.util.FileUploadUtil;
 import com.example.WaterDelivery.util.PersonValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -111,4 +118,80 @@ public class MainController {
         model.addAttribute("orders", orders);
         return "my-orders";
     }
+    @GetMapping("/userProfile")
+    public String personProfile(Model model, Authentication authentication) {
+        String authName = authentication.getName();
+        System.out.println("Authenticated Username: " + authName);
+
+        Person person = personService.getPerson(authName)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + authName));
+
+        List<Order> orders = orderService.showOrders(person);
+
+        model.addAttribute("person", person);
+        model.addAttribute("orders", orders);
+
+        return "userProfile";
+    }
+    @GetMapping("/edit/{id}")
+    public String editProfile(Model model, @PathVariable("id") int id) {
+        Person person = personService.findOne(id);
+
+        model.addAttribute("person", person);
+        return "editProfile";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String updateProfile(Authentication authentication, @PathVariable("id") int id,
+                                @Valid Person personForm, BindingResult bindingResult,
+                                @RequestParam("avatarFile") MultipartFile avatarFile) {
+        if (bindingResult.hasErrors()) {
+            return "editProfile";
+        }
+
+        Person existingPerson = personService.findOne(id);
+
+        if (!avatarFile.isEmpty()) {
+            String originalFileName = avatarFile.getOriginalFilename();
+            String extension = "";
+
+            if (originalFileName != null) {
+                extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+            }
+
+
+            String fileName = existingPerson.getId() + extension;
+            String uploadDir = "user-photos/";
+            try {
+                FileUploadUtil.saveFile(uploadDir, fileName, avatarFile);
+                existingPerson.setAvatarUrl("/" + uploadDir + fileName);
+            } catch (IOException e) {
+                bindingResult.rejectValue("avatarUrl", "error.avatarUrl", e.getMessage());
+                return "editProfile";
+            }
+        }
+
+        // Обновляем данные пользователя
+        existingPerson.setUsername(personForm.getUsername());
+        existingPerson.setEmail(personForm.getEmail());
+        existingPerson.setPhoneNumber(personForm.getPhoneNumber());
+        existingPerson.setAddress(personForm.getAddress());
+        existingPerson.setAbout(personForm.getAbout());
+
+        personService.update(id, existingPerson);
+
+        // Если имя пользователя изменилось, обновляем объект аутентификации
+        if (!authentication.getName().equals(existingPerson.getUsername())) {
+            Authentication newAuth = new UsernamePasswordAuthenticationToken(
+                    existingPerson.getUsername(),
+                    authentication.getCredentials(),
+                    authentication.getAuthorities()
+            );
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
+        }
+
+        return "redirect:/userProfile";
+    }
+
+
 }

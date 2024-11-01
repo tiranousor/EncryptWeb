@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <title>Редактировать Аккаунт</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(120deg, #e0f7fa, #80d8ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 145, 234, 0.2);
+            width: 600px;
+            max-width: 100%;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #0091ea;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f0f8ff;
+            transition: border-color 0.3s;
+            outline: none;
+            box-shadow: 0 4px 15px rgba(0, 145, 234, 0.1);
+        }
+
+        .form-control:focus {
+            border-color: #0091ea;
+        }
+
+        .btn-primary {
+            background-color: #0091ea;
+            color: #fff;
+            padding: 12px 45px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #0070c0;
+        }
+
+        .form-error {
+            color: red;
+            font-size: 12px;
+            margin-top: -5px;
+        }
+
+        #preview {
+            margin: 0 auto 20px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            box-shadow: 0 6px 16px rgba(0, 145, 234, 0.5);
+            object-fit: cover;
+            display: block;
+            border: 2px solid #00bcd4;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h1>Редактировать аккаунт</h1>
+
+    <img id="preview" th:src="${person.avatarUrl != null ? person.avatarUrl : '/noAvatar.png'}" alt="Предпросмотр изображения" />
+
+    <form th:action="@{/edit/{id}(id=${person.id})}" th:method="POST" th:object="${person}" enctype="multipart/form-data">
+        <input type="file" name="avatarFile" class="form-control" accept="image/*" onchange="previewImage(event)" />
+        <div class="form-error" th:if="${#fields.hasErrors('avatarUrl')}" th:errors="*{avatarUrl}"></div>
+
+        <input type="text" class="form-control" th:field="*{username}" id="username" placeholder="Имя пользователя" />
+        <div class="form-error" th:if="${#fields.hasErrors('username')}" th:text="*{username}"></div>
+
+        <input type="email" class="form-control" th:field="*{email}" id="email" placeholder="Email" />
+        <div class="form-error" th:if="${#fields.hasErrors('email')}" th:text="*{email}"></div>
+
+        <input type="text" class="form-control" th:field="*{phoneNumber}" id="phoneNumber" placeholder="Номер телефона" />
+        <div class="form-error" th:if="${#fields.hasErrors('phoneNumber')}" th:text="*{phoneNumber}"></div>
+
+        <input type="text" class="form-control" th:field="*{address}" id="address" placeholder="Адрес" />
+        <div class="form-error" th:if="${#fields.hasErrors('address')}" th:text="*{address}"></div>
+
+        <input type="text" class="form-control" th:field="*{about}" id="about" placeholder="О себе" />
+        <div class="form-error" th:if="${#fields.hasErrors('about')}" th:text="*{about}"></div>
+
+        <input type="hidden" th:field="*{password}" id="password" />
+
+        <button type="submit" class="btn-primary">Сохранить изменения</button>
+    </form>
+</div>
+
+<script>
+    function previewImage(event) {
+        const preview = document.getElementById('preview');
+        const file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                preview.src = reader.result;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = '/noAvatar.png';
+        }
+    }
+</script>
+</body>
+
+</html>
