@@ -16,14 +16,14 @@ public class WaterBottle {
     private Integer id;
 
     @Column(name = "size_liters", nullable = false)
-    private Integer sizeLiters = 20; // Фиксированный объем
+    private Integer sizeLiters;
 
     @Column(name = "price", nullable = false)
-    private Double price = 500.0; // Фиксированная цена
+    private Double price;
 
     @Column(name = "url")
-    private String url = "/images/water.png"; // URL изображения
+    private String url;
 
     @Column(name = "quantity", nullable = false)
-    private Integer quantity = 1; // Значение по умолчанию для количества
+    private Integer quantity = 1;
 }

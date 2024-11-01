@@ -2,155 +2,192 @@
 <html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Доставка воды</title>
+    <title>Доставка Воды</title>
     <link href='https://unpkg.com/css.gg@2.0.0/icons/css/log-in.css' rel='stylesheet'>
     <link href='https://unpkg.com/css.gg@2.0.0/icons/css/log-out.css' rel='stylesheet'>
     <style>
-        /* Добавь сюда твои стили или используй существующие */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: white;
-        }
-        header {
-            background: linear-gradient(70deg, #CAEDA7,  #7E56C8);
-            text-align: center;
+            background: linear-gradient(120deg, #e0f7fa, #80d8ff);
+            overflow-x: hidden;
             display: flex;
-            height: 70px;
+            height: 100vh;
+        }
+        .left-section, .right-section {
+            width: 50%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
             justify-content: center;
-            align-items: center;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border: 1px solid #ddd;
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index:1000;
+            flex-direction: column;
+            position: relative;
         }
-        .header-title {
+        .left-section {
+            background: linear-gradient(120deg, #0091ea, #00bcd4);
             color: white;
-            flex: 1;
+            padding: 50px;
             text-align: center;
-            text-transform: uppercase;
         }
-        .header-icons {
-            display: flex;
-            position:absolute;
-            top:27px;
-            right:90px;
-            align-items: center;
-            background-color: white;
-            z-index:1000;
+        .left-section h1 {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
-        .header-icons a {
-            margin: 0 20px;
-            background-color: white;
+        .left-section p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
         }
-        .container {
-            padding: 120px 0 0 150px;
+        .login-button {
+            background: white;
+            color: #00acc1;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-decoration: none;
+        }
+        .login-button:hover {
+            background: #f0f0f0;
+        }
+
+        /* Carousel Styles */
+        .carousel-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: 0 auto;
+            justify-content: center;
+            position: relative;
+            width: 100%;
+            height: 600px;
+            overflow: hidden;
+            perspective: 1000px;
         }
-        .water-item {
-            width: 300px;
-            padding: 20px;
-            background-color: #F5F6F8;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
+        .carousel-item {
+            position: absolute;
+            opacity: 0;
+            transition: transform 0.5s, opacity 0.5s;
+            transform-style: preserve-3d;
+            background: rgba(255, 255, 255, 0.5); /* Semi-transparent background */
+            border-radius: 15px; /* Rounded corners */
+            padding: 20px; /* Add padding inside each item */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Shadow for a 3D effect */
         }
-        .water-item img {
-            width: 200px;
-            height: 300px;
-            object-fit: contain;
-            margin-bottom: 15px;
+        .carousel-item.active {
+             background: white; /* Solid white background for the central item */
+    opacity: 1;
+            transform: scale(1.2) translateY(0); /* Center item */
+            z-index: 2;
         }
-        .water-price {
-            font-size: 1.5em;
-            color: #7E56C8;
-            margin: 15px 0;
+        .carousel-item.previous {
+            opacity: 0.6;
+            transform: scale(0.9) translateY(-200px); /* Move upwards with spacing */
+            z-index: 1;
         }
-        .buy-button {
-            background-color: #7E56C8;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 32px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
+        .carousel-item.next {
+            opacity: 0.6;
+            transform: scale(0.9) translateY(200px); /* Move downwards with spacing */
+            z-index: 1;
         }
+        .carousel-item img {
+            max-width: 200px;
+            height: auto;
+            border-bottom: 2px solid #00bcd4;
+            margin-bottom: 10px;
+        }
+    .water-item {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.water-price {
+    font-size: 1.5em;
+    color: #00796b;
+    margin: 10px 0; /* Centered and evenly spaced */
+    text-align: center; /* Center the text */
+}
+
+.buy-button {
+    background: #0091ea;
+    border: none;
+    color: white;
+    padding: 10px 30px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background 0.3s ease;
+    margin-top: 15px; /* Space between the price and button */
+    text-decoration: none; /* Remove underline from the button text */
+}
+
         .buy-button:hover {
-            background-color: #63419F;
+            background: #00838f;
         }
     </style>
 </head>
 <body>
-<header>
-    <h1 class="header-title">Доставка воды</h1>
-    <div sec:authorize="isAuthenticated()" class="header-icons">
-        <a href="/cart"><i class="gg-cart"></i></a>
-        <a href="/my-orders"><i class="gg-list"></i></a>
-        <form th:action="@{/logout}" th:method="POST">
-            <button type="submit" class="buy-button">Выход</button>
-        </form>
-    </div>
-    <div sec:authorize="!isAuthenticated()" class="header-icons">
-        <a href="/login"><i class="gg-log-in"></i></a>
-    </div>
-</header>
-<div class="container">
-    <div th:each="waterBottle : ${waterBottle}" class="water-item">
-        <img th:src="${waterBottle.url}" alt="Бутылка воды">
-        <div class="water-price" th:text="'Цена: ' + ${waterBottle.price} + ' руб.'">Цена: 500 руб.</div>
-        <div sec:authorize="hasRole('ROLE_USER')">
-            <meta name="_csrf" th:content="${_csrf.token}"/>
-            <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-            <button class="buy-button"
-                    th:data-person-id="${person_id}"
-                    th:data-waterBottle-id="${waterBottle.id}"
-                    id="buyButton">
-                Купить воду
-            </button>
-        </div>
-        <div sec:authorize="isAnonymous()">
-            <a th:href="@{/login}" class="buy-button">Войти, чтобы купить</a>
+<div class="left-section">
+    <h1>VOGU?</h1>
+    <h1>VODA? НУДА.</h1>
+    <p>Добро пожаловать на сайт Доставки Воды</p>
+    <p>У нас вы найдете самые качественные и свежие бутылированные воды для вашего здоровья и комфорта. Заказывайте прямо сейчас и ощутите разницу!</p>
+</div>
+<div class="right-section">
+    <div class="carousel-wrapper">
+        <div th:each="waterBottle : ${waterBottle}" class="carousel-item">
+            <img th:src="${waterBottle.url}" alt="Бутылка воды">
+            <div class="water-price" th:text="'Цена: ' + ${waterBottle.price} + ' руб.'">Цена: 500 руб.</div>
+            <div sec:authorize="hasRole('ROLE_USER')">
+                <button class="buy-button"
+                        th:data-person-id="${person_id}"
+                        th:data-waterBottle-id="${waterBottle.id}">
+                    Купить воду
+                </button>
+            </div>
+            <div sec:authorize="isAnonymous()">
+                <a th:href="@{/login}" class="buy-button">Войти, чтобы купить</a>
+            </div>
         </div>
     </div>
 </div>
 
-
 <script>
-    function addToCart(personId, waterBottleId, csrfToken) {
-        fetch(`/add-order/${personId}/${waterBottleId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            }
-        })
-        .then(response => response.text())
-        .then(data => {
-            if (data === "Item added to cart") {
-                let button = document.getElementById('buyButton');
-                button.innerText = "Перейти в корзину";
-                button.onclick = () => window.location.href = '/cart';
-                button.classList.add('go-to-cart');
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
+    document.addEventListener("DOMContentLoaded", function() {
+        const items = document.querySelectorAll('.carousel-item');
+        let currentIndex = 0;
+        const delay = 3000; // 3 seconds
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-        document.getElementById('buyButton').addEventListener('click', function() {
-            const personId = this.getAttribute('data-person-id');
-            const waterBottleId = this.getAttribute('data-waterBottle-id');
-            addToCart(personId, waterBottleId, csrfToken);
-        });
+        function showItems() {
+            items.forEach((item, index) => {
+                item.classList.remove('active', 'previous', 'next');
+                if (index === currentIndex) {
+                    item.classList.add('active');
+                } else if (index === (currentIndex - 1 + items.length) % items.length) {
+                    item.classList.add('previous');
+                } else if (index === (currentIndex + 1) % items.length) {
+                    item.classList.add('next');
+                }
+            });
+        }
+
+        function rotateItems() {
+            currentIndex = (currentIndex + 1) % items.length;
+            showItems();
+        }
+
+        showItems();
+        setInterval(rotateItems, delay);
     });
 </script>
 </body>

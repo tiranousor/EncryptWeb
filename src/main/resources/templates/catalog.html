@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Доставка Воды</title>
+    <link href='https://unpkg.com/css.gg@2.0.0/icons/css/log-in.css' rel='stylesheet'>
+    <link href='https://unpkg.com/css.gg@2.0.0/icons/css/log-out.css' rel='stylesheet'>
+    <style>
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(120deg, #e0f7fa, #80d8ff);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            background: linear-gradient(70deg, #0091ea, #00bcd4);
+            text-align: center;
+            display: flex;
+            height: 70px;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        .header-title {
+            color: white;
+            flex: 1;
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 1.8em;
+            margin: 0;
+        }
+        .header-icons {
+            display: flex;
+            position: absolute;
+            top: 20px;
+            right: 90px;
+            align-items: center;
+            background-color: white;
+            z-index: 1000;
+        }
+        .header-icons a {
+            margin: 0 20px;
+            background-color: transparent;
+        }
+        .container {
+            padding: 140px 0 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: flex-start;
+            max-width: 1200px;
+        }
+        .water-item {
+            width: calc(25% - 30px);
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .water-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        .water-item img {
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+            object-fit: contain;
+            border-bottom: 2px solid #00bcd4;
+            margin-bottom: 15px;
+        }
+        .water-price {
+            font-size: 1.5em;
+            color: #00796b;
+            margin: 15px 0;
+        }
+        .buy-button {
+            background-color: #7E56C8;
+            border: none;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background 0.3s ease;
+        }
+        .buy-button:hover {
+            background: #63419F;
+        }
+        .login-button {
+            background: white;
+            color: #7E56C8;
+            border: 2px solid #7E56C8;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s ease, color 0.3s ease;
+            text-decoration: none;
+        }
+        .login-button:hover {
+            background: #f0f0f0;
+            color: #63419F;
+        }
+        /* Menu Styles */
+        #nav-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+        }
+        .button {
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .icon-bar {
+            width: 100%;
+            height: 4px;
+            background-color: white;
+            transition: background-color 0.3s;
+        }
+        #nav-content {
+            background: white;
+            position: absolute;
+            top: 50px;
+            left: 0;
+            width: 200px;
+            display: none;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        #nav-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #nav-content ul li {
+            margin: 10px 0;
+        }
+        #nav-content ul li a,
+        #nav-content ul li input[type="submit"] {
+            color: #333;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        #nav-content ul li a:hover,
+        #nav-content ul li input[type="submit"]:hover {
+            color: #7E56C8;
+        }
+        .bg {
+            background: rgba(0, 0, 0, 0.4);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1 class="header-title">Доставка Воды</h1>
+    <div sec:authorize="isAuthenticated()" class="header-icons">
+        <a href="/cart"><i class="gg-cart"></i></a>
+        <a href="/my-orders"><i class="gg-list"></i></a>
+        <form th:action="@{/logout}" th:method="POST">
+            <button type="submit" class="buy-button">Выход</button>
+        </form>
+    </div>
+    <div sec:authorize="!isAuthenticated()" class="header-icons">
+        <a href="/login"><i class="gg-log-in"></i></a>
+    </div>
+</header>
+
+<div id="nav-container">
+    <div class="bg"></div>
+    <div class="button" tabindex="0">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+    </div>
+    <div id="nav-content" tabindex="0">
+        <div sec:authorize="hasRole('ROLE_ADMIN')">
+            <ul>
+                <li><span sec:authentication="name"></span></li>
+                <li> <a href="/">Главная</a></li>
+                <li> <a href="/add-book">Добавить</a></li>
+                <li>  <a href="/bookDetails">Редактировать</a></li>
+                <li> <a href="/users">Заказы</a></li>
+                <li>
+                    <form th:action="@{/logout}" th:method="POST">
+                        <input  style="background-color: transparent;border:0; padding: 10px 5px; display: block; text-transform: uppercase; color: #333;" onmouseover="this.style.color=' #7E56C8';" onmouseout="this.style.color='#333';" type="submit" value="Выход">
+                    </form>
+                </li>
+            </ul>
+        </div>
+        <div sec:authorize="hasRole('ROLE_USER')">
+            <ul>
+                <li><span sec:authentication="name"></span></li>
+                <li> <a href="/">Главная</a></li>
+                <li>  <a href="/cart">Корзина</a></li>
+                <li> <a href="/my-orders">Заказы</a></li>
+                <li>
+                    <form th:action="@{/logout}" th:method="POST">
+                        <input  style="background-color: transparent;border:0; padding: 10px 5px; display: block; text-transform: uppercase; color: #333;" onmouseover="this.style.color=' #7E56C8';" onmouseout="this.style.color='#333';" type="submit" value="Выход">
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div th:each="waterBottle : ${waterBottle}" class="water-item">
+        <img th:src="${waterBottle.url}" alt="Бутылка воды">
+        <div class="water-price" th:text="'Цена: ' + ${waterBottle.price} + ' руб.'">Цена: 500 руб.</div>
+        <div sec:authorize="hasRole('ROLE_USER')">
+            <meta name="_csrf" th:content="${_csrf.token}"/>
+            <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+            <button class="buy-button"
+                    th:data-person-id="${person_id}"
+                    th:data-waterBottle-id="${waterBottle.id}"
+                    th:id="'buyButton' + ${waterBottle.id}">
+                Купить воду
+            </button>
+        </div>
+        <div sec:authorize="isAnonymous()">
+            <a th:href="@{/login}" class="buy-button" style="background-color: #0091ea; color: white;">Войти, чтобы купить</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function addToCart(personId, waterBottleId, csrfToken) {
+        fetch(`/add-order/${personId}/${waterBottleId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .then(response => response.text())
+        .then(data => {
+            if (data === "Item added to cart") {
+                let button = document.getElementById('buyButton' + waterBottleId);
+                button.innerText = "Перейти в корзину";
+                button.onclick = () => window.location.href = '/cart';
+                button.classList.add('go-to-cart');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        document.querySelectorAll('.buy-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const personId = this.getAttribute('data-person-id');
+                const waterBottleId = this.getAttribute('data-waterBottle-id');
+                addToCart(personId, waterBottleId, csrfToken);
+            });
+        });
+
+        // Toggle navigation
+        const button = document.querySelector('#nav-container .button');
+        const navContent = document.getElementById('nav-content');
+        const bg = document.querySelector('#nav-container .bg');
+
+        button.addEventListener('click', () => {
+            navContent.style.display = navContent.style.display === 'none' || navContent.style.display === '' ? 'block' : 'none';
+            bg.style.display = bg.style.display === 'none' || bg.style.display === '' ? 'block' : 'none';
+        });
+
+        bg.addEventListener('click', () => {
+            navContent.style.display = 'none';
+            bg.style.display = 'none';
+        });
+    });
+</script>
+</body>
+</html>

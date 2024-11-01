@@ -27,14 +27,18 @@ public class WaterBottleService {
     }
 
     @PostConstruct
-    public void initializeWaterBottle() {
+    public void initializeWaterBottles() {
         if (waterBottleRepository.count() == 0) {
-            WaterBottle defaultBottle = new WaterBottle();
-            defaultBottle.setSizeLiters(20);
-            defaultBottle.setPrice(500.0);
-            defaultBottle.setUrl("/images/water.png");
-            defaultBottle.setQuantity(1);
-            waterBottleRepository.save(defaultBottle);
+            // Создаем различные типы бутылок с разным объемом и ценой
+            WaterBottle bottle5L = new WaterBottle(null, 5, 150.0, "/images/water.png", 1);
+            WaterBottle bottle10L = new WaterBottle(null, 10, 250.0, "/images/water.png", 1);
+            WaterBottle bottle19L = new WaterBottle(null, 19, 400.0, "/images/water.png", 1);
+            WaterBottle bottle30L = new WaterBottle(null, 30, 750.0, "/images/water.png", 1);
+
+            waterBottleRepository.save(bottle5L);
+            waterBottleRepository.save(bottle10L);
+            waterBottleRepository.save(bottle19L);
+            waterBottleRepository.save(bottle30L);
         }
     }
 }
