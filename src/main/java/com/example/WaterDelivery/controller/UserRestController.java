@@ -2,6 +2,7 @@ package com.example.WaterDelivery.controller;
 
 import com.example.WaterDelivery.services.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,10 +15,14 @@ public class UserRestController {
         this.cartService = cartService;
     }
 
-    @PostMapping("/add-order/{person_id}/{book_id}")
-    public String addOrder(Model model, @PathVariable int person_id, @PathVariable int book_id){
-        cartService.saveCart(person_id, book_id);
-        return "Item added to cart";
+    @PostMapping("/add-order/{person_id}/{waterBottle_id}")
+    public ResponseEntity<?> addOrder(@PathVariable int person_id, @PathVariable int waterBottle_id){
+        try {
+            cartService.saveCart(person_id, waterBottle_id);
+            return ResponseEntity.ok().body("{\"status\":\"success\", \"message\":\"Item added to cart\"}");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"status\":\"error\", \"message\":\"" + e.getMessage() + "\"}");
+        }
     }
 }
 

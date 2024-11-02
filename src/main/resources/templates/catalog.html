@@ -7,6 +7,7 @@
     <link href='https://unpkg.com/css.gg@2.0.0/icons/css/log-out.css' rel='stylesheet'>
     <link href='https://unpkg.com/css.gg@2.0.0/icons/css/shopping-cart.css' rel='stylesheet'>
     <style>
+        /* Ваши стили остаются без изменений */
         body {
             font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
@@ -17,7 +18,7 @@
             flex-direction: column;
             align-items: center;
         }
-           header {
+        header {
             background: linear-gradient(70deg, #0091ea, #00bcd4);
             text-align: center;
             display: flex;
@@ -130,14 +131,15 @@
             max-width: 1200px;
         }
         .water-item {
-    width: 23%; /* 4 items per row with space between */
+            width: 23%; /* 4 items per row with space between */
             box-sizing: border-box;
             padding: 20px;
             background-color: #ffffff;
             border: 1px solid #ddd;
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            margin-bottom: 20px;  }
+            margin-bottom: 20px;
+        }
         .water-item:hover {
             transform: scale(1.05);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
@@ -195,7 +197,7 @@
             flex-direction: column;
             justify-content: space-between;
         }
-  #nav-content ul li span {
+        #nav-content ul li span {
             display: block;
             font-weight: bold;
             color: #333;
@@ -207,7 +209,6 @@
 <body>
 <header>
     <h1 class="header-title">Доставка Воды</h1>
-    </div>
 </header>
 <div class="menu-button" tabindex="0">
     <div class="menu-bar"></div>
@@ -216,30 +217,38 @@
 </div>
 
 <div id="nav-container">
-    <div id="nav-content" >
+    <div id="nav-content">
         <div sec:authorize="hasRole('ROLE_ADMIN')">
             <ul>
                 <li></li>
-                <li> <a href="/">Главная</a></li>
-                <li> <a href="/add-book">Добавить</a></li>
-                <li>  <a href="/bookDetails">Редактировать</a></li>
-                <li> <a href="/users">Заказы</a></li>
+                <li><a href="/">Главная</a></li>
+                <li><a href="/add-book">Добавить</a></li>
+                <li><a href="/bookDetails">Редактировать</a></li>
+                <li><a href="/users">Заказы</a></li>
                 <li>
                     <form th:action="@{/logout}" th:method="POST">
-                        <input  style="background-color: transparent;border:0; padding: 10px 5px; display: block; text-transform: uppercase; color: #333;" onmouseover="this.style.color=' #0091ea';" onmouseout="this.style.color='#333';" type="submit" value="Выход">
+                        <input style="background-color: transparent;border:0; padding: 10px 5px; display: block; text-transform: uppercase; color: #333;"
+                               onmouseover="this.style.color=' #0091ea';"
+                               onmouseout="this.style.color='#333';"
+                               type="submit"
+                               value="Выход">
                     </form>
                 </li>
             </ul>
         </div>
         <div sec:authorize="hasRole('ROLE_USER')">
             <ul>
-                <li><span sec:authentication="name"></span></li>
-                <li> <a href="/">Главная</a></li>
-                <li>  <a href="/cart">Корзина</a></li>
-                <li> <a href="/my-orders">Заказы</a></li>
+                <li><a th:href="@{/userProfile}" sec:authentication="name"></a></li>
+                <li><a href="/">Главная</a></li>
+                <li><a href="/cart">Корзина</a></li>
+                <li><a href="/my-orders">Заказы</a></li>
                 <li>
                     <form th:action="@{/logout}" th:method="POST">
-                        <input  style="background-color: transparent;border:0; padding: 10px 5px; display: block; text-transform: uppercase; color: #333;" onmouseover="this.style.color=' #0091ea';" onmouseout="this.style.color='#333';" type="submit" value="Выход">
+                        <input style="background-color: transparent;border:0; padding: 10px 5px; display: block; text-transform: uppercase; color: #333;"
+                               onmouseover="this.style.color=' #0091ea';"
+                               onmouseout="this.style.color='#333';"
+                               type="submit"
+                               value="Выход">
                     </form>
                 </li>
             </ul>
@@ -268,6 +277,50 @@
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Получаем CSRF токен
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+
+        // Функция для добавления товара в корзину
+        function addToCart(personId, waterBottleId, csrfToken, button) {
+            fetch(`/add-order/${personId}/${waterBottleId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    button.innerText = "Перейти в корзину";
+                    button.classList.add('go-to-cart');
+                } else {
+                    console.error('Error:', data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Добавляем обработчики событий к кнопкам "Купить воду"
+        document.querySelectorAll('.buy-button').forEach(button => {
+            button.addEventListener('click', function(event) {
+                // Проверяем, имеет ли кнопка класс 'go-to-cart'
+                if (this.classList.contains('go-to-cart')) {
+                    // Перенаправляем пользователя в корзину
+                    window.location.href = '/cart';
+                    return; // Прекращаем дальнейшее выполнение
+                }
+
+                // Получаем данные из кнопки
+                const personId = this.getAttribute('data-person-id');
+                const waterBottleId = this.getAttribute('data-waterBottle-id');
+
+                // Добавляем товар в корзину
+                addToCart(personId, waterBottleId, csrfToken, this);
+            });
+        });
+
+        // Обработчики для меню навигации
         const menuButton = document.querySelector('.menu-button');
         const navContainer = document.getElementById('nav-container');
         const bg = document.querySelector('.bg');
@@ -280,53 +333,6 @@
         bg.addEventListener('click', () => {
             navContainer.classList.remove('open');
             bg.classList.remove('active');
-        });
-    });
-</script>
-<script>
-    function addToCart(personId, waterBottleId, csrfToken) {
-        fetch(`/add-order/${personId}/${waterBottleId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            }
-        })
-        .then(response => response.text())
-        .then(data => {
-            if (data === "Item added to cart") {
-                let button = document.getElementById('buyButton' + waterBottleId);
-                button.innerText = "Перейти в корзину";
-                button.onclick = () => window.location.href = '/cart';
-                button.classList.add('go-to-cart');
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-        document.querySelectorAll('.buy-button').forEach(button => {
-            button.addEventListener('click', function() {
-                const personId = this.getAttribute('data-person-id');
-                const waterBottleId = this.getAttribute('data-waterBottle-id');
-                addToCart(personId, waterBottleId, csrfToken);
-            });
-        });
-
-        // Toggle navigation
-        const button = document.querySelector('#nav-container .button');
-        const navContent = document.getElementById('nav-content');
-        const bg = document.querySelector('#nav-container .bg');
-
-        button.addEventListener('click', () => {
-            navContent.style.display = navContent.style.display === 'none' || navContent.style.display === '' ? 'block' : 'none';
-            bg.style.display = bg.style.display === 'none' || bg.style.display === '' ? 'block' : 'none';
-        });
-
-        bg.addEventListener('click', () => {
-            navContent.style.display = 'none';
-            bg.style.display = 'none';
         });
     });
 </script>

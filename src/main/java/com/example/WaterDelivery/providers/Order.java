@@ -29,5 +29,5 @@ public class Order {
 
     private Double totalOrderPrice;
 
-    private String status;
+    private String status = "Оформлен";
 }

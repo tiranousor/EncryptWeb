@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Пользователи и Заказы</title>
     <style>
-        /* Добавь стили по своему усмотрению */
+        /* Ваши стили остаются без изменений */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -145,12 +145,6 @@
 <body>
 <header>
     <h1 class="header-title">Пользователи и Заказы</h1>
-    <div class="header-icons">
-        <a href="/admin/add-water-bottle"><button class="add-button">Добавить Бутылку</button></a>
-        <form th:action="@{/logout}" th:method="POST">
-            <button type="submit" class="add-button" style="background-color: #FF6B6B;">Выход</button>
-        </form>
-    </div>
 </header>
 
 <div class="container">
@@ -175,17 +169,7 @@
                                 <div class="cart-item-quantity">Дата: <span th:text="${#temporals.format(order.orderDate, 'dd-MM-yyyy HH:mm:ss')}">01-01-2024 12:00:00</span></div>
                                 <div class="order-status" th:class="'status-' + ${order.status}" th:text="${order.status}">Оформлен</div>
                             </div>
-                            <div class="action-links">
-                                <form th:action="@{/updateOrderStatus}" method="post">
-                                    <input type="hidden" name="orderId" th:value="${order.id}" />
-                                    <select name="status">
-                                        <option value="Оформлен" th:selected="${order.status == 'Оформлен'}">Оформлен</option>
-                                        <option value="Впути" th:selected="${order.status == 'Впути'}">Впути</option>
-                                        <option value="Доставлен" th:selected="${order.status == 'Доставлен'}">Доставлен</option>
-                                    </select>
-                                    <button type="submit">Обновить Статус</button>
-                                </form>
-                            </div>
+                            <!-- Удалённый блок action-links -->
                         </div>
                     </li>
                 </ul>
@@ -193,7 +177,7 @@
         </tr>
         </tbody>
     </table>
-    <a href="/" class="back-button">Вернуться к Главной</a>
+    <a href="/catalog" class="back-button">Вернуться к Главной</a>
 </div>
 </body>
 </html>

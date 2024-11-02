@@ -1,5 +1,6 @@
 package com.example.WaterDelivery.controller;
 
+import com.example.WaterDelivery.dto.AddressDTO;
 import com.example.WaterDelivery.providers.Cart;
 import com.example.WaterDelivery.providers.Order;
 import com.example.WaterDelivery.providers.Person;
@@ -13,7 +14,6 @@ import com.example.WaterDelivery.util.PersonValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.method.P;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,7 +26,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 public class MainController {
@@ -118,6 +122,7 @@ public class MainController {
         model.addAttribute("orders", orders);
         return "my-orders";
     }
+
     @GetMapping("/userProfile")
     public String personProfile(Model model, Authentication authentication) {
         String authName = authentication.getName();
@@ -192,6 +197,27 @@ public class MainController {
 
         return "redirect:/userProfile";
     }
+    @GetMapping("/api/orders")
+    @ResponseBody
+    public Set<AddressDTO> getAllOrderAddresses() {
+        List<Order> orders = orderService.showAllOrders();
+        return orders.stream()
+                .map(order -> splitAddress(order.getPerson().getAddress()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
 
-
+    private AddressDTO splitAddress(String address) {
+        if (address == null || address.trim().isEmpty()) {
+            return null;
+        }
+        String[] parts = address.trim().split("\\s+");
+        if (parts.length < 2) {
+            // Неверный формат адреса
+            return new AddressDTO(address, "");
+        }
+        String number = parts[parts.length - 1];
+        String street = String.join(" ", Arrays.copyOf(parts, parts.length - 1));
+        return new AddressDTO(street, number);
+    }
 }

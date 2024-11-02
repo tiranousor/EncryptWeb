@@ -290,7 +290,7 @@
         </div>
         <div sec:authorize="hasRole('ROLE_USER')">
             <ul>
-                <li><span sec:authentication="name"></span></li>
+                <li><a th:href="@{/userProfile}" sec:authentication="name"></a></li>
                 <li> <a href="/catalog">Главная</a></li>
 
                 <li>  <a href="/cart">Корзина</a></li>

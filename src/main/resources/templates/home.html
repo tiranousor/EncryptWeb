@@ -149,11 +149,9 @@
             <img th:src="${waterBottle.url}" alt="Бутылка воды">
             <div class="water-price" th:text="'Цена: ' + ${waterBottle.price} + ' руб.'">Цена: 500 руб.</div>
             <div sec:authorize="hasRole('ROLE_USER')">
-                <button class="buy-button"
-                        th:data-person-id="${person_id}"
-                        th:data-waterBottle-id="${waterBottle.id}">
+                <a th:href="@{/catalog}" class="buy-button">
                     Купить воду
-                </button>
+                </a>
             </div>
             <div sec:authorize="isAnonymous()">
                 <a th:href="@{/login}" class="buy-button">Войти, чтобы купить</a>

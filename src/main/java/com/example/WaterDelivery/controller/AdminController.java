@@ -30,6 +30,6 @@ public class AdminController {
         List<Order> orders = orderService.showAllOrders();
         Map<Person, List<Order>> personOrdersMap = orders.stream().collect(Collectors.groupingBy(Order::getPerson));
         model.addAttribute("personOrdersMap", personOrdersMap);
-        return "admin-orders";
+        return "users";
     }
 }
