@@ -37,19 +37,18 @@ public class Person {
     @Column(name = "role", nullable = false)
     private String role = "ROLE_USER";
 
-    // Дополнительные поля для доставки
-    @NotEmpty(message = "Адрес не должен быть пустым")
-    @Column(name = "address", nullable = false)
-    private String address;
-
-    @NotEmpty(message = "Номер телефона не должен быть пустым")
-    @Pattern(regexp = "^\\+?[0-9]{7,15}$", message = "Некорректный формат номера телефона")
-    @Column(name = "phone_number", nullable = false)
-    private String phoneNumber;
-
     // Если требуется, можно добавить email
     @NotEmpty(message = "Email не должен быть пустым")
     @Email(message = "Некорректный формат email")
     @Column(name = "email", unique = true, nullable = false)
     private String email;
+    @Column(name = "rsa_private_key", columnDefinition = "TEXT")
+    private String rsaPrivateKey;
+
+    @Column(name = "rsa_public_key", columnDefinition = "TEXT")
+    private String rsaPublicKey;
+
+    @Column(name = "aes_key", columnDefinition = "TEXT")
+    private String aesKey;
+
 }

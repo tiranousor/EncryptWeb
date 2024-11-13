@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Send Message</title>
+</head>
+<body>
+<h1>Send Message</h1>
+
+<form action="#" th:action="@{/send-message}" method="get">
+    <input type="text" name="search" th:value="${searchQuery}" placeholder="Search users">
+    <button type="submit">Search</button>
+</form>
+
+<h2>Select Receiver</h2>
+<form action="#" th:action="@{/send-message}" method="post">
+    <table>
+        <thead>
+        <tr>
+            <th>Username</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${searchResults}">
+            <td th:text="${user.username}"></td>
+            <td>
+                <input type="radio" name="receiverId" th:value="${user.id}" required>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <form action="#" th:action="@{/send-message}" method="post">
+        <label for="content">Message:</label>
+        <textarea id="content" name="content" rows="4" cols="50" placeholder="Enter your message" required></textarea><br>
+
+        <label for="encryptionMethod">Encryption Method:</label>
+        <select id="encryptionMethod" name="encryptionMethod" required>
+            <option value="RSA">RSA</option>
+            <option value="AES">AES</option>
+        </select><br>
+
+        <button type="submit">Send Message</button>
+    </form>
+
+</form>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages</title>
+</head>
+<body>
+<h1>Your Messages</h1>
+
+<!-- Проверяем, аутентифицирован ли пользователь -->
+<div th:if="${#authentication.principal eq 'anonymousUser'}">
+    <p>You are not logged in.</p>
+    <a th:href="@{/login}">Login</a>
+    <a th:href="@{/registration}">Register</a>
+</div>
+
+<div th:if="${#authentication.principal ne 'anonymousUser'}">
+    <!-- Отображаем сообщения, если пользователь аутентифицирован -->
+    <h2>Received Messages</h2>
+    <ul>
+        <th:block th:each="message : ${receivedMessages}">
+            <li>
+                <strong>From:</strong> <span th:text="${message.sender.username}"></span><br>
+                <strong>Content:</strong> <span th:text="${message.content}"></span><br>
+                <strong>Encryption Method:</strong> <span th:text="${message.encryptionMethod}"></span>
+            </li>
+        </th:block>
+    </ul>
+
+    <h2>Sent Messages</h2>
+    <ul>
+        <th:block th:each="message : ${sentMessages}">
+            <li>
+                <strong>To:</strong> <span th:text="${message.receiver.username}"></span><br>
+                <strong>Content:</strong> <span th:text="${message.content}"></span><br>
+                <strong>Encryption Method:</strong> <span th:text="${message.encryptionMethod}"></span>
+            </li>
+        </th:block>
+    </ul>
+
+    <div th:if="${username}">
+        <h1>Encryption Details</h1>
+        <p><strong>Username:</strong> <span th:text="${username}"></span></p>
+        <p><strong>Encrypted Text:</strong> <span th:text="${encryptedText}"></span></p>
+        <p><strong>Key:</strong> <span th:text="${key}"></span></p>
+    </div>
+</div>
+</body>
+</html>

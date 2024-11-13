@@ -7,11 +7,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
-
 public class PersonService {
     private final PersonRepository personRepository;
     private final PasswordEncoder passwordEncoder;
@@ -21,28 +20,35 @@ public class PersonService {
         this.personRepository = personRepository;
         this.passwordEncoder = passwordEncoder;
     }
-    public Person findOne(int id) {
-        Optional<Person> foundClient = personRepository.findById(id);
-        return foundClient.orElse(null);
+    public List<Person> searchUsers(String search, Person currentUser) {
+        return personRepository.findAll().stream()
+                .filter(person -> person.getId() != currentUser.getId()) // Исключаем текущего пользователя
+                .filter(person -> person.getUsername().toLowerCase().contains(search.toLowerCase())) // Фильтруем по имени
+                .toList();
     }
+
+
     public Optional<Person> getPerson(String username) {
         return personRepository.findByUsername(username);
     }
-    public Optional<Person> getClientByPhoneNumber(String phoneNumber) {
-        return personRepository.findByPhoneNumber(phoneNumber);
-    }
-    public Optional<Person> getClientByEmail(String email) {
+
+    public Optional<Person> getPersonByEmail(String email) {
         return personRepository.findByEmail(email);
     }
 
+    public Optional<Person> getPersonById(int id) {
+        return personRepository.findById(id);
+    }
+
+    public List<Person> getAllUsersExcept(Person currentUser) {
+        return personRepository.findAll().stream()
+                .filter(person -> person.getId() != currentUser.getId())
+                .toList();
+    }
+
     @Transactional
-    public void save(Person person){
+    public void save(Person person) {
         person.setPassword(passwordEncoder.encode(person.getPassword()));
         personRepository.save(person);
-    }
-    @Transactional
-    public void update(int id, Person updateClient){
-        updateClient.setId(id);
-        personRepository.save(updateClient);
     }
 }
