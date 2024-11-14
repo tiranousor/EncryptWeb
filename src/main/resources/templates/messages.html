@@ -29,6 +29,9 @@
                     <label for="privateKey">Enter Your Private Key:</label><br>
                     <textarea id="privateKey" name="privateKey" rows="6" cols="60" placeholder="Your RSA Private Key" required></textarea><br>
                     <button type="submit">Decrypt Message</button>
+                    <div th:if="${error}">
+                        <p style="color: red;" th:text="${error}"></p>
+                    </div>
                 </form>
                 <div th:if="${decryptedMessages[message.id]}">
                     <strong>Decrypted Content:</strong> <span th:text="${decryptedMessages[message.id]}"></span>
