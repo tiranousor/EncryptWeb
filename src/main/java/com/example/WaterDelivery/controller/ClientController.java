@@ -15,8 +15,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 @Controller
 public class ClientController {
@@ -62,6 +65,7 @@ public class ClientController {
 
     }
 
+
     @GetMapping("/messages")
     public String showMessages(Model model, Authentication authentication) {
         if (authentication != null) {
@@ -73,11 +77,18 @@ public class ClientController {
                 model.addAttribute("receivedMessages", receivedMessages);
                 model.addAttribute("sentMessages", sentMessages);
                 model.addAttribute("person", currentUser);
+
+                // Retrieve decryptedMessages from flash attributes or initialize as empty
+                @SuppressWarnings("unchecked")
+                Map<Integer, String> decryptedMessages = (Map<Integer, String>) model.asMap().getOrDefault("decryptedMessages", new HashMap<Integer, String>());
+                model.addAttribute("decryptedMessages", decryptedMessages);
+                return "messages";
             }
         }
-        return "messages";
+        return "redirect:/login";
     }
 
+    // Display Send Message Form
     @GetMapping("/send-message")
     public String showSendMessageForm(
             @RequestParam(required = false, defaultValue = "") String search,
@@ -91,27 +102,67 @@ public class ClientController {
                 List<Person> searchResults = personService.searchUsers(search, currentUser);
 
                 model.addAttribute("person", currentUser);
-                model.addAttribute("message", new Message());
                 model.addAttribute("searchResults", searchResults);
                 model.addAttribute("searchQuery", search);
+                model.addAttribute("message", new Message()); // For form binding
+
+                // Initialize decryptedMessages as an empty map
+                model.addAttribute("decryptedMessages", new HashMap<Integer, String>());
             }
         }
         return "sendMessage";
     }
-
     @PostMapping("/send-message")
     public String sendMessage(
-            @ModelAttribute Message message,
             @RequestParam int receiverId,
+            @RequestParam String content,
             @RequestParam String encryptionMethod,
-            Authentication authentication
+            Authentication authentication,
+            RedirectAttributes redirectAttributes
     ) {
         if (authentication != null) {
             Person sender = personService.getPerson(authentication.getName()).orElse(null);
             Person receiver = personService.getPersonById(receiverId).orElseThrow(() -> new RuntimeException("Receiver not found"));
 
             if (sender != null) {
-                messageService.sendMessage(sender, receiver, message.getContent(), encryptionMethod);
+                try {
+                    String encryptedContent;
+                    if ("RSA".equalsIgnoreCase(encryptionMethod)) {
+                        String receiverPublicKey = receiver.getRsaPublicKey();
+                        if (receiverPublicKey == null || receiverPublicKey.isEmpty()) {
+                            // Handle error: receiver has no public key
+                            redirectAttributes.addFlashAttribute("error", "Receiver has no public key.");
+                            return "redirect:/messages";
+                        }
+                        encryptedContent = encryptionService.encryptWithRSA(content, receiverPublicKey);
+                    } else if ("AES".equalsIgnoreCase(encryptionMethod)) {
+                        // Generate a new AES key for this message
+                        String aesKey = encryptionService.generateAESKey();
+                        String encryptedContentAES = encryptionService.encryptWithAES(content, aesKey);
+                        // Encrypt the AES key with receiver's public key
+                        String encryptedAESKey = encryptionService.encryptWithRSA(aesKey, receiver.getRsaPublicKey());
+                        // Combine encrypted AES key and encrypted content
+                        encryptedContent = encryptedAESKey + ":" + encryptedContentAES;
+                    } else {
+                        // Unsupported encryption method
+                        redirectAttributes.addFlashAttribute("error", "Unsupported encryption method.");
+                        return "redirect:/messages";
+                    }
+
+                    // Create and send the message
+                    Message message = new Message();
+                    message.setSender(sender);
+                    message.setReceiver(receiver);
+                    message.setContent(encryptedContent);
+                    message.setEncryptionMethod(encryptionMethod);
+                    messageService.sendMessage(message);
+
+                    redirectAttributes.addFlashAttribute("success", "Message sent successfully.");
+                } catch (Exception e) {
+                    // Handle encryption error
+                    logger.error("Error sending message: {}", e.getMessage());
+                    redirectAttributes.addFlashAttribute("error", "Encryption error occurred.");
+                }
             }
         }
         return "redirect:/messages";

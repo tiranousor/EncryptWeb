@@ -42,11 +42,11 @@ public class Person {
     @Email(message = "Некорректный формат email")
     @Column(name = "email", unique = true, nullable = false)
     private String email;
-    @Column(name = "rsa_private_key", columnDefinition = "TEXT")
-    private String rsaPrivateKey;
-
-    @Column(name = "rsa_public_key", columnDefinition = "TEXT")
+    @Column(length = 4096)
     private String rsaPublicKey;
+
+    @Column(length = 4096)
+    private String rsaPrivateKey;
 
     @Column(name = "aes_key", columnDefinition = "TEXT")
     private String aesKey;

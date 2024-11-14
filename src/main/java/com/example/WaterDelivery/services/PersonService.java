@@ -14,19 +14,21 @@ import java.util.Optional;
 public class PersonService {
     private final PersonRepository personRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EncryptionService encryptionService;
 
     @Autowired
-    public PersonService(PersonRepository personRepository, PasswordEncoder passwordEncoder) {
+    public PersonService(PersonRepository personRepository, PasswordEncoder passwordEncoder, EncryptionService encryptionService) {
         this.personRepository = personRepository;
         this.passwordEncoder = passwordEncoder;
-    }
-    public List<Person> searchUsers(String search, Person currentUser) {
-        return personRepository.findAll().stream()
-                .filter(person -> person.getId() != currentUser.getId()) // Исключаем текущего пользователя
-                .filter(person -> person.getUsername().toLowerCase().contains(search.toLowerCase())) // Фильтруем по имени
-                .toList();
+        this.encryptionService = encryptionService;
     }
 
+    public List<Person> searchUsers(String search, Person currentUser) {
+        return personRepository.findAll().stream()
+                .filter(person -> person.getId() != currentUser.getId()) // Exclude current user
+                .filter(person -> person.getUsername().toLowerCase().contains(search.toLowerCase())) // Filter by username
+                .toList();
+    }
 
     public Optional<Person> getPerson(String username) {
         return personRepository.findByUsername(username);
@@ -49,6 +51,12 @@ public class PersonService {
     @Transactional
     public void save(Person person) {
         person.setPassword(passwordEncoder.encode(person.getPassword()));
+        try {
+            encryptionService.generateKeys(person, "RSA"); // Generate RSA keys upon registration
+            encryptionService.generateKeys(person, "AES"); // Generate AES key upon registration
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating keys: " + e.getMessage());
+        }
         personRepository.save(person);
     }
 }

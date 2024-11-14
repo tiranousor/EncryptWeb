@@ -13,11 +13,10 @@ import lombok.NoArgsConstructor;
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    private int id;
+    @Column(columnDefinition = "TEXT")
     private String content; // Зашифрованное сообщение
 
-    @Column(name = "encryption_method")
     private String encryptionMethod;
 
     @ManyToOne

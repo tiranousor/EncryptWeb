@@ -46,7 +46,7 @@ public class SecurityConfiguration {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/process_login")
-                        .successHandler(customSuccessHandler())
+                        .defaultSuccessUrl("/messages", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )

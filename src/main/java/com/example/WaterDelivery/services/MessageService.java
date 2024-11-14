@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MessageService {
@@ -16,6 +17,10 @@ public class MessageService {
     @Autowired
     public MessageService(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
+    }
+
+    public void sendMessage(Message message) {
+        messageRepository.save(message);
     }
 
     public void sendMessage(Person sender, Person receiver, String content, String encryptionMethod) {
@@ -34,7 +39,12 @@ public class MessageService {
     public List<Message> getMessagesBySender(Person sender) {
         return messageRepository.findBySender(sender);
     }
+
     public List<Message> getMessages(Person sender, Person receiver) {
         return messageRepository.findBySenderAndReceiverOrderByIdAsc(sender, receiver);
+    }
+
+    public Optional<Message> getMessageById(int id) {
+        return messageRepository.findById(id);
     }
 }

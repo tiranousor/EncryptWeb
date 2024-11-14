@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +8,7 @@
 <body>
 <h1>Your Messages</h1>
 
-<!-- Проверяем, аутентифицирован ли пользователь -->
+<!-- Check if the user is authenticated -->
 <div th:if="${#authentication.principal eq 'anonymousUser'}">
     <p>You are not logged in.</p>
     <a th:href="@{/login}">Login</a>
@@ -16,14 +16,23 @@
 </div>
 
 <div th:if="${#authentication.principal ne 'anonymousUser'}">
-    <!-- Отображаем сообщения, если пользователь аутентифицирован -->
+    <!-- Display messages if the user is authenticated -->
     <h2>Received Messages</h2>
     <ul>
         <th:block th:each="message : ${receivedMessages}">
             <li>
                 <strong>From:</strong> <span th:text="${message.sender.username}"></span><br>
-                <strong>Content:</strong> <span th:text="${message.content}"></span><br>
-                <strong>Encryption Method:</strong> <span th:text="${message.encryptionMethod}"></span>
+                <strong>Encrypted Content:</strong> <span th:text="${message.content}"></span><br>
+                <strong>Encryption Method:</strong> <span th:text="${message.encryptionMethod}"></span><br>
+                <form th:action="@{/decryptMessage}" method="post">
+                    <input type="hidden" name="messageId" th:value="${message.id}" />
+                    <label for="privateKey">Enter Your Private Key:</label><br>
+                    <textarea id="privateKey" name="privateKey" rows="6" cols="60" placeholder="Your RSA Private Key" required></textarea><br>
+                    <button type="submit">Decrypt Message</button>
+                </form>
+                <div th:if="${decryptedMessages[message.id]}">
+                    <strong>Decrypted Content:</strong> <span th:text="${decryptedMessages[message.id]}"></span>
+                </div>
             </li>
         </th:block>
     </ul>
@@ -33,18 +42,13 @@
         <th:block th:each="message : ${sentMessages}">
             <li>
                 <strong>To:</strong> <span th:text="${message.receiver.username}"></span><br>
-                <strong>Content:</strong> <span th:text="${message.content}"></span><br>
+                <strong>Encrypted Content:</strong> <span th:text="${message.content}"></span><br>
                 <strong>Encryption Method:</strong> <span th:text="${message.encryptionMethod}"></span>
             </li>
         </th:block>
     </ul>
 
-    <div th:if="${username}">
-        <h1>Encryption Details</h1>
-        <p><strong>Username:</strong> <span th:text="${username}"></span></p>
-        <p><strong>Encrypted Text:</strong> <span th:text="${encryptedText}"></span></p>
-        <p><strong>Key:</strong> <span th:text="${key}"></span></p>
-    </div>
+    <a th:href="@{/send-message}">Send a New Message</a>
 </div>
 </body>
 </html>
