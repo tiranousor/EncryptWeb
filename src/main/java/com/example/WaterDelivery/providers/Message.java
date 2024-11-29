@@ -5,25 +5,32 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "messages")
 public class Message {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    @Column(columnDefinition = "TEXT")
-    private String content; // Зашифрованное сообщение
+    private Long id;
 
-    private String encryptionMethod;
-
+    // Отправитель
     @ManyToOne
-    @JoinColumn(name = "sender_id")
-    private Person sender;
+    @JoinColumn(name = "sender_id", nullable = false)
+    private User sender;
 
+    // Получатель
     @ManyToOne
-    @JoinColumn(name = "receiver_id")
-    private Person receiver;
-}
+    @JoinColumn(name = "receiver_id", nullable = false)
+    private User receiver;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String encryptedMessage;
+
+    @Column(nullable = false)
+    private String method; // "caesar", "aes", "rsa"
+
+    @Column(nullable = false)
+    private LocalDateTime timestamp;}
