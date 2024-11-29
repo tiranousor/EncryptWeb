@@ -8,4 +8,6 @@ import java.util.List;
 public interface UserContactRepository extends JpaRepository<UserContact, Long> {
     Optional<UserContact> findByUserAndContactAndMethod(User user, User contact, String method);
     List<UserContact> findByUser(User user);
+
+    Optional<UserContact> findByUserIdAndContactIdAndMethod(Long userId, Long contactId, String lowerCase);
 }

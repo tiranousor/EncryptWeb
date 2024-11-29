@@ -16,7 +16,6 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // Регистрация пользователя
     public User registerUser(String username, String password) {
         if(userRepository.findByUsername(username).isPresent()) {
             throw new IllegalArgumentException("Пользователь с таким именем уже существует");
@@ -27,7 +26,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // Получение пользователя по ID
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));

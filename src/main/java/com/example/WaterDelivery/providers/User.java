@@ -21,21 +21,17 @@ public class User {
     private String username;
 
     @Column(nullable = false)
-    private String password; // Хранить хэш пароля
+    private String password;
 
-    // Связь с ключами
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Key> keys;
 
-    // Связь с отправленными сообщениями
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Message> sentMessages;
 
-    // Связь с полученными сообщениями
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Message> receivedMessages;
 
-    // Связь с контактами
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<UserContact> contacts;
 

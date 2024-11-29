@@ -16,12 +16,10 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Отправитель
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)
     private User sender;
 
-    // Получатель
     @ManyToOne
     @JoinColumn(name = "receiver_id", nullable = false)
     private User receiver;
@@ -30,7 +28,7 @@ public class Message {
     private String encryptedMessage;
 
     @Column(nullable = false)
-    private String method; // "caesar", "aes", "rsa"
+    private String method;
 
     @Column(nullable = false)
     private LocalDateTime timestamp;}

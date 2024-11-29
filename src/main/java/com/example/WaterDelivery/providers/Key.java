@@ -23,8 +23,8 @@ public class Key {
     private User user;
 
     @Column(nullable = false)
-    private String method; // "caesar", "aes", "rsa_public", "rsa_private"
+    private String method;
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    private String keyData; // Хранение ключей в виде строки (например, Base64)
+    private String keyData;
 }

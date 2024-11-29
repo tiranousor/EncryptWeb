@@ -1,5 +1,6 @@
 package com.example.WaterDelivery.controller;
 
+import com.example.WaterDelivery.dto.DecryptRequest;
 import com.example.WaterDelivery.services.EncryptionService;
 import com.example.WaterDelivery.repositories.MessageRepository;
 import com.example.WaterDelivery.providers.Message;
@@ -8,12 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-/**
- * Контроллер для управления шифрованием и обменом сообщениями.
- */
 @RestController
 @RequestMapping("/api")
-public class    EncryptionController {
+public class EncryptionController {
 
     @Autowired
     private EncryptionService encryptionService;
@@ -21,11 +19,6 @@ public class    EncryptionController {
     @Autowired
     private MessageRepository messageRepository;
 
-    /**
-     * 1. /generate - Генерация или обновление ключей.
-     * Пример использования:
-     * http://localhost:8080/api/generate?userId=1&method=rsa
-     */
     @PostMapping("/generate")
     public ResponseEntity<String> generateKeys(@RequestParam Long userId,
                                                @RequestParam String method) {
@@ -37,105 +30,87 @@ public class    EncryptionController {
         }
     }
 
-    /**
-     * 2. /send_public_key - Добавление или обновление публичного ключа контакта.
-     * Пример использования:
-     * curl -X POST "http://localhost:8080/api/send_public_key" \
-     *      -d "userId=1" \
-     *      -d "contactId=2" \
-     *      -d "method=rsa" \
-     *      -d "publicKey=BASE64_PUBLIC_KEY_STRING"
-     */
+
     @PostMapping("/send_public_key")
-    public ResponseEntity<String> sendPublicKey(@RequestParam Long userId,
-                                                @RequestParam Long contactId,
-                                                @RequestParam String method,
-                                                @RequestParam String publicKey) {
+    public ResponseEntity<String> sendPublicKey(@RequestParam Long fromUserId,
+                                                @RequestParam Long toUserId,
+                                                @RequestParam String method) {
         try {
-            encryptionService.addOrUpdateContact(userId, contactId, method, publicKey);
-            return ResponseEntity.ok("Публичный ключ контакта сохранён");
+            encryptionService.sendPublicKey(fromUserId, toUserId, method);
+            return ResponseEntity.ok("Публичный ключ отправлен пользователю ID: " + toUserId);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Ошибка сохранения публичного ключа: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Ошибка отправки публичного ключа: " + e.getMessage());
         }
     }
 
-    /**
-     * 3. /encrypt_and_send - Шифрование и отправка сообщения.
-     * Пример использования:
-     * curl -X POST "http://localhost:8080/api/encrypt_and_send" \
-     *      -d "senderId=1" \
-     *      -d "receiverId=2" \
-     *      -d "message=Привет, Боб!" \
-     *      -d "method=rsa"
-     */
+
+    @PostMapping("/get_public_key")
+    public ResponseEntity<String> getPublicKey(@RequestParam Long userId,
+                                               @RequestParam Long contactId,
+                                               @RequestParam String method) {
+        try {
+            encryptionService.fetchAndStoreContactPublicKey(userId, contactId, method);
+            return ResponseEntity.ok("Публичный ключ получен и сохранён");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Ошибка получения публичного ключа: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/encrypt")
+    public ResponseEntity<String> encrypt(@RequestParam Long userId,
+                                          @RequestParam Long contactId,
+                                          @RequestParam String method,
+                                          @RequestParam String message) {
+        try {
+            String encryptedMessage = encryptionService.encryptMessageWithContactKey(userId, contactId, method, message);
+            return ResponseEntity.ok(encryptedMessage);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Ошибка шифрования сообщения: " + e.getMessage());
+        }
+    }
+
+
     @PostMapping("/encrypt_and_send")
     public ResponseEntity<String> encryptAndSend(@RequestParam Long senderId,
                                                  @RequestParam Long receiverId,
-                                                 @RequestParam String message,
-                                                 @RequestParam String method) {
+                                                 @RequestParam String method,
+                                                 @RequestParam String message) {
         try {
-            encryptionService.sendMessage(senderId, receiverId, message, method);
-            return ResponseEntity.ok("Сообщение зашифровано и отправлено");
+            String encryptedMessage = encryptionService.encryptAndSendMessage(senderId, receiverId, method, message);
+            return ResponseEntity.ok("Сообщение зашифровано и отправлено " + encryptedMessage);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Ошибка шифрования/отправки: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Ошибка шифрования/отправки сообщения: " + e.getMessage());
         }
     }
 
-    /**
-     * 4. /get_encrypted_msg - Получение и дешифрование сообщения.
-     * Пример использования:
-     * curl -X POST "http://localhost:8080/api/get_encrypted_msg" \
-     *      -d "receiverId=2" \
-     *      -d "encryptedMessage=ENCRYPTED_MESSAGE_STRING" \
-     *      -d "method=rsa"
-     */
+
+    @PostMapping("/send_encrypted_msg")
+    public ResponseEntity<String> sendEncryptedMsg(@RequestParam Long senderId,
+                                                   @RequestParam Long receiverId,
+                                                   @RequestParam String method,
+                                                   @RequestParam String encryptedMessage) {
+        try {
+            encryptionService.saveEncryptedMessage(senderId, receiverId, encryptedMessage, method);
+            return ResponseEntity.ok("Зашифрованное сообщение отправлено");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Ошибка отправки сообщения: " + e.getMessage());
+        }
+    }
+
+
     @PostMapping("/get_encrypted_msg")
-    public ResponseEntity<String> getEncryptedMsg(@RequestParam Long receiverId,
-                                                  @RequestParam String encryptedMessage,
-                                                  @RequestParam String method) {
+    public ResponseEntity<String> getEncryptedMsg(@RequestBody DecryptRequest decryptRequest) {
         try {
-            String decrypted = encryptionService.rsaDecryptMessage(receiverId, encryptedMessage);
-            return ResponseEntity.ok(decrypted);
+            String decryptedMessage = encryptionService.decryptMessage(
+                    decryptRequest.getReceiverId(),
+                    decryptRequest.getEncryptedMessage(),
+                    decryptRequest.getMethod()
+            );
+            return ResponseEntity.ok(decryptedMessage);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Ошибка дешифрования: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Ошибка дешифрования сообщения: " + e.getMessage());
         }
     }
 
-    /**
-     * 5. /messages - Получение всех расшифрованных сообщений для пользователя.
-     * Пример использования:
-     * curl -X GET "http://localhost:8080/api/messages?receiverId=2"
-     */
-    @GetMapping("/messages")
-    public ResponseEntity<List<String>> getAllMessages(@RequestParam Long receiverId) {
-        try {
-            List<String> decryptedMessages = encryptionService.getAllDecryptedMessages(receiverId);
-            return ResponseEntity.ok(decryptedMessages);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    /**
-     * Дополнительный эндпоинт для добавления контакта и их публичного ключа.
-     * Является синонимом /send_public_key.
-     * Пример использования:
-     * curl -X POST "http://localhost:8080/api/add_contact" \
-     *      -d "userId=1" \
-     *      -d "contactId=2" \
-     *      -d "method=rsa" \
-     *      -d "publicKey=BASE64_PUBLIC_KEY_STRING"
-     */
-    @PostMapping("/add_contact")
-    public ResponseEntity<String> addContact(@RequestParam Long userId,
-                                             @RequestParam Long contactId,
-                                             @RequestParam String method,
-                                             @RequestParam String publicKey) {
-        try {
-            encryptionService.addOrUpdateContact(userId, contactId, method, publicKey);
-            return ResponseEntity.ok("Контакт добавлен/обновлён успешно");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Ошибка добавления контакта: " + e.getMessage());
-        }
-    }
 }

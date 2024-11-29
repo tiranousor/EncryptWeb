@@ -16,12 +16,10 @@ public class UserContact {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Владелец контакта
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Контактный пользователь
     @ManyToOne
     @JoinColumn(name = "contact_id", nullable = false)
     private User contact;
@@ -30,5 +28,5 @@ public class UserContact {
     private String publicKey;
 
     @Column(nullable = false)
-    private String method; // "rsa", "aes" и т.д.
+    private String method;
 }

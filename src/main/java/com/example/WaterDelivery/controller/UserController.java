@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Контроллер для управления пользователями.
- */
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -21,7 +19,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // Регистрация нового пользователя
+
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestParam String username, @RequestParam String password) {
         try {
@@ -32,12 +30,11 @@ public class UserController {
         }
     }
 
-    // Получение информации о пользователе (опционально)
+
     @GetMapping("/{userId}")
     public ResponseEntity<User> getUser(@PathVariable Long userId) {
         try {
             User user = userService.getUserById(userId);
-            // Не возвращать пароль в ответе
             user.setPassword(null);
             return ResponseEntity.ok(user);
         } catch (IllegalArgumentException e) {
